@@ -99,3 +99,52 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* Map Styles */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.pushpin-container {
+  position: relative;
+  width: 26px;
+  height: 38px;
+}
+
+.pushpin-head {
+  width: 20px;
+  height: 20px;
+  background: #14b8a6;
+  border: 3px solid white;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: all 0.2s ease;
+}
+
+.pushpin-needle {
+  width: 2px;
+  height: 18px;
+  background: #14b8a6;
+  position: absolute;
+  top: 17px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.custom-marker:hover .pushpin-head {
+  transform: translateX(-50%) scale(1.1);
+  background: #0d9488;
+}
+
+.custom-popup {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.custom-popup h4 {
+  font-family: 'Playfair Display', serif;
+}
