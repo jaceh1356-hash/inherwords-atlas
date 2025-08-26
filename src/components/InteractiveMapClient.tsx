@@ -1,25 +1,37 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 
-// Sample story data
-const storyPins = [
+// Fallback pins in case API fails
+const fallbackPins = [
   { lat: 40.7128, lng: -74.0060, type: 'story', title: 'Healthcare Access in NYC', category: 'healthcare' },
   { lat: 34.0522, lng: -118.2437, type: 'organization', title: 'Women\'s Health Center LA', category: 'support' },
-  { lat: 51.5074, lng: -0.1278, type: 'story', title: 'Workplace Equality Story', category: 'workplace' },
-  { lat: 48.8566, lng: 2.3522, type: 'organization', title: 'Paris Women\'s Rights Org', category: 'support' },
-  { lat: 35.6762, lng: 139.6503, type: 'story', title: 'Education Rights in Tokyo', category: 'education' },
-  { lat: -33.8688, lng: 151.2093, type: 'organization', title: 'Sydney Support Network', category: 'support' },
-  { lat: 19.4326, lng: -99.1332, type: 'story', title: 'Reproductive Rights Story', category: 'reproductive' },
-  { lat: 28.6139, lng: 77.2090, type: 'story', title: 'Women\'s Empowerment Delhi', category: 'empowerment' },
-  { lat: -1.2921, lng: 36.8219, type: 'organization', title: 'Nairobi Health Initiative', category: 'support' },
-  { lat: -23.5505, lng: -46.6333, type: 'story', title: 'Mental Health Awareness', category: 'mental-health' }
+  { lat: 51.5074, lng: -0.1278, type: 'story', title: 'Workplace Equality Story', category: 'workplace' }
 ]
 
 export default function InteractiveMapClient() {
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<L.Map | null>(null)
+  const [storyPins, setStoryPins] = useState(fallbackPins)
+
+  // Fetch pins from Google Sheets
+  useEffect(() => {
+    const fetchPins = async () => {
+      try {
+        const response = await fetch('/api/map-pins')
+        const data = await response.json()
+        if (data.pins && data.pins.length > 0) {
+          setStoryPins(data.pins)
+        }
+      } catch (error) {
+        console.error('Failed to fetch map pins, using fallback:', error)
+        // Keep using fallback pins
+      }
+    }
+
+    fetchPins()
+  }, [])
 
   useEffect(() => {
     if (!mapRef.current || leafletMap.current) return
