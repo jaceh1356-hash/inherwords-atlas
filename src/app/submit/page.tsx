@@ -144,8 +144,11 @@ function SimpleShareStoryForm() {
     setIsSubmitting(true)
     setSubmitMessage('')
 
+    // Store form reference before async operations
+    const form = e.currentTarget
+
     try {
-      const formData = new FormData(e.currentTarget)
+      const formData = new FormData(form)
       const data = {
         title: formData.get('title'),
         story: formData.get('story'),
@@ -167,15 +170,26 @@ function SimpleShareStoryForm() {
 
       const result = await response.json()
 
-      if (result.success) {
-        setSubmitMessage(result.message)
-        // Reset form
-        e.currentTarget.reset()
+      if (response.ok && result.success) {
+        setSubmitMessage('✅ Story submitted successfully! It will be reviewed before being added to the map.')
+        // Reset form using stored reference
+        if (form) {
+          form.reset()
+        }
+        // Scroll to message
+        setTimeout(() => {
+          document.querySelector('[data-message]')?.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
       } else {
-        setSubmitMessage(result.message)
+        setSubmitMessage(result.message || 'Failed to submit story. Please try again.')
       }
     } catch (error) {
-      setSubmitMessage('Failed to submit story. Please try again.')
+      console.error('Fetch error:', error)
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        setSubmitMessage('Network error: Please check your connection and try again.')
+      } else {
+        setSubmitMessage('Failed to submit story. Please try again.')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -348,12 +362,27 @@ function SimpleShareStoryForm() {
               </button>
               
               {submitMessage && (
-                <div className={`mt-4 p-3 rounded-lg ${
-                  submitMessage.includes('successfully') 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {submitMessage}
+                <div 
+                  data-message
+                  className={`mt-6 p-4 rounded-lg text-center font-medium ${
+                    submitMessage.includes('successfully') || submitMessage.includes('Story submitted successfully')
+                      ? 'bg-green-100 border-2 border-green-300 text-green-800' 
+                      : 'bg-red-100 border-2 border-red-300 text-red-800'
+                  }`}
+                >
+                  {submitMessage.includes('successfully') || submitMessage.includes('Story submitted successfully') ? (
+                    <div>
+                      <div className="text-2xl mb-2">✅</div>
+                      <div className="text-lg font-bold mb-1">Success!</div>
+                      <div>{submitMessage}</div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="text-2xl mb-2">❌</div>
+                      <div className="text-lg font-bold mb-1">Error</div>
+                      <div>{submitMessage}</div>
+                    </div>
+                  )}
                 </div>
               )}
               

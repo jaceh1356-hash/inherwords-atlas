@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error submitting story:', error)
+    console.error('Error submitting story:', error instanceof Error ? error.message : 'Unknown error')
     return NextResponse.json(
       { success: false, message: 'Failed to submit story. Please try again.' },
       { status: 500 }
