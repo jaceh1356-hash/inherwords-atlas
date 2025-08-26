@@ -12,7 +12,7 @@ An interactive world map that visualizes gender inequality through the Gender In
 
 ## 🚀 Live Demo
 
-Visit the live site: [Your Domain Here]
+Visit the live site: https://inherwords.vercel.app
 
 ## 🛠 Technology Stack
 
