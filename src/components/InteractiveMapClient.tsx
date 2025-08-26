@@ -1,0 +1,384 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+import L from 'leaflet'
+
+// Sample story data
+const storyPins = [
+  { lat: 40.7128, lng: -74.0060, type: 'story', title: 'Healthcare Access in NYC', category: 'healthcare' },
+  { lat: 34.0522, lng: -118.2437, type: 'organization', title: 'Women\'s Health Center LA', category: 'support' },
+  { lat: 51.5074, lng: -0.1278, type: 'story', title: 'Workplace Equality Story', category: 'workplace' },
+  { lat: 48.8566, lng: 2.3522, type: 'organization', title: 'Paris Women\'s Rights Org', category: 'support' },
+  { lat: 35.6762, lng: 139.6503, type: 'story', title: 'Education Rights in Tokyo', category: 'education' },
+  { lat: -33.8688, lng: 151.2093, type: 'organization', title: 'Sydney Support Network', category: 'support' },
+  { lat: 19.4326, lng: -99.1332, type: 'story', title: 'Reproductive Rights Story', category: 'reproductive' },
+  { lat: 28.6139, lng: 77.2090, type: 'story', title: 'Women\'s Empowerment Delhi', category: 'empowerment' },
+  { lat: -1.2921, lng: 36.8219, type: 'organization', title: 'Nairobi Health Initiative', category: 'support' },
+  { lat: -23.5505, lng: -46.6333, type: 'story', title: 'Mental Health Awareness', category: 'mental-health' }
+]
+
+export default function InteractiveMapClient() {
+  const mapRef = useRef<HTMLDivElement>(null)
+  const leafletMap = useRef<L.Map | null>(null)
+
+  useEffect(() => {
+    if (!mapRef.current || leafletMap.current) return
+
+    // Initialize the map with updated pin styles
+    leafletMap.current = L.map(mapRef.current, {
+      center: [20, 0],
+      zoom: 2,
+      minZoom: 2,
+      maxZoom: 10,
+      scrollWheelZoom: true,
+      zoomControl: false
+    })
+
+    // Add custom zoom control
+    L.control.zoom({
+      position: 'topleft'
+    }).addTo(leafletMap.current)
+
+    // Add tile layer with clearer country borders
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(leafletMap.current)
+
+    // Add country boundaries overlay for clearer borders
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(leafletMap.current)
+
+    // Create custom pushpin icon (same for both stories and organizations)
+    const pushpinIcon = L.divIcon({
+      className: 'custom-marker',
+      html: '<div class="pushpin-container"><div class="pushpin-head"></div><div class="pushpin-needle"></div></div>',
+      iconSize: [26, 38],
+      iconAnchor: [13, 38]
+    })
+
+    // Add story pins to the map
+    storyPins.forEach(pin => {
+      const marker = L.marker([pin.lat, pin.lng], { icon: pushpinIcon })
+        .addTo(leafletMap.current!)
+
+      // Add popup with story/organization info
+      marker.bindPopup(`
+        <div class="custom-popup">
+          <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
+          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? 'Personal Story' : 'Support Organization'}</p>
+          <span class="inline-block px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">${pin.category}</span>
+        </div>
+      `)
+    })
+
+    // Gender Inequality Index data - using exact country names from GeoJSON
+    const giiData: Record<string, { value: number; level: string }> = {
+      // High Inequality Countries (Red)
+      'Yemen': { value: 0.82, level: 'high' },
+      'Nigeria': { value: 0.68, level: 'high' },
+      'Afghanistan': { value: 0.67, level: 'high' },
+      'Chad': { value: 0.67, level: 'high' },
+      'Somalia': { value: 0.67, level: 'high' },
+      'Liberia': { value: 0.66, level: 'high' },
+      'Mali': { value: 0.61, level: 'high' },
+      'Niger': { value: 0.61, level: 'high' },
+      'Guinea': { value: 0.61, level: 'high' },
+      'Sierra Leone': { value: 0.61, level: 'high' },
+      'Pakistan': { value: 0.52, level: 'high' },
+      'Bangladesh': { value: 0.50, level: 'high' },
+      'India': { value: 0.44, level: 'high' },
+      'Indonesia': { value: 0.44, level: 'high' },
+      'Iran': { value: 0.48, level: 'high' },
+      'Iraq': { value: 0.56, level: 'high' },
+      'Morocco': { value: 0.44, level: 'high' },
+
+      // Medium Inequality Countries (Blue)
+      'Brazil': { value: 0.39, level: 'medium' },
+      'Egypt': { value: 0.39, level: 'medium' },
+      'Philippines': { value: 0.39, level: 'medium' },
+      'Colombia': { value: 0.39, level: 'medium' },
+      'Mexico': { value: 0.35, level: 'medium' },
+      'Thailand': { value: 0.31, level: 'medium' },
+      'Argentina': { value: 0.29, level: 'medium' },
+      'Turkey': { value: 0.26, level: 'medium' },
+      'China': { value: 0.19, level: 'medium' },
+      'United States': { value: 0.18, level: 'medium' },
+      'Russia': { value: 0.18, level: 'medium' },
+      'Ukraine': { value: 0.19, level: 'medium' },
+      'Chile': { value: 0.19, level: 'medium' },
+      'Peru': { value: 0.36, level: 'medium' },
+      'Vietnam': { value: 0.38, level: 'medium' },
+      'Viet Nam': { value: 0.38, level: 'medium' }, // Alternative name
+
+      // Low Inequality Countries (Green)
+      'Norway': { value: 0.01, level: 'low' },
+      'Denmark': { value: 0.01, level: 'low' },
+      'Sweden': { value: 0.02, level: 'low' },
+      'Switzerland': { value: 0.02, level: 'low' },
+      'Finland': { value: 0.03, level: 'low' },
+      'Netherlands': { value: 0.03, level: 'low' },
+      'Germany': { value: 0.07, level: 'low' },
+      'Canada': { value: 0.07, level: 'low' },
+      'France': { value: 0.08, level: 'low' },
+      'Japan': { value: 0.08, level: 'low' },
+      'United Kingdom': { value: 0.09, level: 'low' },
+      'Australia': { value: 0.06, level: 'low' },
+      'New Zealand': { value: 0.08, level: 'low' },
+      'South Korea': { value: 0.06, level: 'low' },
+      'Korea': { value: 0.06, level: 'low' }, // Alternative name
+      'Spain': { value: 0.06, level: 'low' },
+      'Italy': { value: 0.06, level: 'low' }
+    }
+
+    // Function to get color based on inequality level
+    const getColorByLevel = (level: string) => {
+      switch(level) {
+        case 'high': return '#fca5a5'    // Very Light Red
+        case 'medium': return '#93c5fd'  // Very Light Blue  
+        case 'low': return '#6ee7b7'     // Very Light Green
+        default: return '#e5e7eb'        // Light gray for countries without data
+      }
+    }
+
+    // Handle common name variations
+    const nameVariations: Record<string, string> = {
+      'United States of America': 'United States',
+      'Russian Federation': 'Russia',
+      'Republic of Korea': 'South Korea', 'Korea, Republic of': 'South Korea',
+      'Viet Nam': 'Vietnam',
+      'Islamic Republic of Iran': 'Iran',
+      'Republic of the Philippines': 'Philippines',
+      'People\'s Republic of China': 'China',
+      'Republic of Turkey': 'Turkey',
+      'Federal Republic of Germany': 'Germany',
+      'French Republic': 'France',
+      'Kingdom of Spain': 'Spain', 'Italian Republic': 'Italy',
+      'Republic of India': 'India', 'Republic of Indonesia': 'Indonesia',
+      'Islamic Republic of Pakistan': 'Pakistan',
+      'People\'s Republic of Bangladesh': 'Bangladesh',
+      'Kingdom of Thailand': 'Thailand',
+      'Federative Republic of Brazil': 'Brazil',
+      'Argentine Republic': 'Argentina',
+      'Republic of Chile': 'Chile', 'Republic of Peru': 'Peru',
+      'Arab Republic of Egypt': 'Egypt',
+      'Kingdom of Morocco': 'Morocco',
+      'Republic of Iraq': 'Iraq', 'Republic of Yemen': 'Yemen',
+      'Federal Republic of Nigeria': 'Nigeria',
+      'Islamic Republic of Afghanistan': 'Afghanistan',
+      'Republic of Chad': 'Chad', 'Somali Republic': 'Somalia',
+      'Republic of Liberia': 'Liberia', 'Republic of Mali': 'Mali',
+      'Republic of Niger': 'Niger', 'Republic of Guinea': 'Guinea',
+      'Republic of Sierra Leone': 'Sierra Leone',
+      'Kingdom of Norway': 'Norway', 'Kingdom of Denmark': 'Denmark',
+      'Kingdom of Sweden': 'Sweden', 'Swiss Confederation': 'Switzerland',
+      'Republic of Finland': 'Finland',
+      'Kingdom of the Netherlands': 'Netherlands',
+      'Commonwealth of Australia': 'Australia',
+      'Dominion of New Zealand': 'New Zealand', 'Dominion of Canada': 'Canada'
+    }
+
+    // Function to get color for a country based on GII data
+    const getCountryColor = (countryName: string) => {
+      const country = giiData[countryName] || giiData[nameVariations[countryName]]
+      
+      if (!country) {
+        console.log(`No GII data found for: "${countryName}"`)
+        return '#e5e7eb' // Light gray for countries without data
+      }
+      return getColorByLevel(country.level)
+    }
+
+    // Add choropleth layer for countries using world countries GeoJSON
+    fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+      .then(response => response.json())
+      .then(data => {
+        if (!leafletMap.current) return
+
+        // Debug: Log all country names from GeoJSON
+        console.log('Countries in GeoJSON:', data.features.map((f: { properties: { name: string } }) => f.properties.name).sort())
+
+        const geojsonLayer = L.geoJSON(data, {
+          style: (feature) => {
+            const countryName = feature?.properties?.name
+            const color = getCountryColor(countryName)
+            
+            return {
+              fillColor: color,
+              weight: 1,
+              opacity: 1,
+              color: '#94a3b8', // Border color
+              fillOpacity: 0.6
+            }
+          },
+          onEachFeature: (feature, layer) => {
+            const countryName = feature?.properties?.name
+            const country = giiData[countryName] || giiData[nameVariations[countryName]]
+            
+            const tooltip = country 
+              ? `<div style="text-align: center;">
+                  <strong>${countryName}</strong><br/>
+                  GII: ${country.value}<br/>
+                  <span style="color: ${getColorByLevel(country.level)};">${country.level.toUpperCase()} Inequality</span>
+                </div>`
+              : `<div style="text-align: center;">
+                  <strong>${countryName}</strong><br/>
+                  GII: No data available
+                </div>`
+            
+            layer.bindTooltip(tooltip)
+          }
+        }).addTo(leafletMap.current)
+      })
+      .catch(error => {
+        console.error('Error loading world GeoJSON:', error)
+      })
+
+    return () => {
+      if (leafletMap.current) {
+        leafletMap.current.remove()
+        leafletMap.current = null
+      }
+    }
+  }, [])
+
+  return (
+    <>
+      <div ref={mapRef} className="w-full h-96 md:h-[500px] rounded-lg overflow-hidden" />
+      
+      {/* Gender Inequality Index Legend */}
+      <div className="mt-6 bg-white p-4 rounded-lg shadow-sm border">
+        <div className="flex items-center gap-2 mb-3">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="font-semibold text-gray-800">Map Legend</h3>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Legend Color Scale */}
+          <div>
+            <h4 className="font-medium text-sm text-gray-700 mb-3">Gender Inequality Index</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#6ee7b7' }}></div>
+                <span className="text-sm text-gray-600">Low Inequality (0.01-0.15)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#93c5fd' }}></div>
+                <span className="text-sm text-gray-600">Medium Inequality (0.16-0.39)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#fca5a5' }}></div>
+                <span className="text-sm text-gray-600">High Inequality (0.40+)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#e5e7eb' }}></div>
+                <span className="text-sm text-gray-600">No Data Available</span>
+              </div>
+            </div>
+          </div>
+
+          {/* GII Information */}
+          <div>
+            <h4 className="font-medium text-sm text-gray-700 mb-3">About the GII</h4>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              The Gender Inequality Index (GII) measures inequality between women and men in three dimensions: 
+              reproductive health, empowerment, and labor market participation. Values range from 0 (perfect equality) 
+              to 1 (complete inequality). Higher values indicate greater disparities between women and men's achievements.
+            </p>
+            <p className="text-xs text-gray-500 mt-2 italic">
+              Data source: UN Human Development Reports
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Custom CSS for realistic pushpins - Medium Size */}
+      <style jsx global>{`
+        .pushpin-container {
+          position: relative;
+          width: 26px;
+          height: 38px;
+          cursor: pointer;
+        }
+
+        .pushpin-head {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: radial-gradient(circle at 30% 30%, #ff6b6b, #dc2626, #b91c1c);
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          box-shadow: 
+            0 2px 8px rgba(0,0,0,0.35),
+            inset -1.5px -1.5px 4px rgba(0,0,0,0.2),
+            inset 1.5px 1.5px 4px rgba(255,255,255,0.3);
+          border: 1.5px solid rgba(0,0,0,0.1);
+        }
+
+        .pushpin-needle {
+          width: 2px;
+          height: 20px;
+          background: linear-gradient(to bottom, #e5e5e5, #a3a3a3, #737373);
+          position: absolute;
+          top: 15px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-radius: 0 0 50% 50%;
+          box-shadow: 
+            0.8px 0 1.5px rgba(0,0,0,0.3),
+            -0.8px 0 0.8px rgba(255,255,255,0.2);
+        }
+
+        .pushpin-container:hover {
+          transform: scale(1.12);
+          transition: transform 0.2s ease;
+        }
+
+        .pushpin-container:hover .pushpin-head {
+          box-shadow: 
+            0 4px 15px rgba(0,0,0,0.45),
+            inset -2px -2px 5px rgba(0,0,0,0.2),
+            inset 2px 2px 5px rgba(255,255,255,0.3);
+        }
+
+        .custom-popup .leaflet-popup-content {
+          margin: 8px 12px;
+          line-height: 1.4;
+        }
+
+        .leaflet-popup-content-wrapper {
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .leaflet-control-zoom {
+          border: none !important;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+
+        .leaflet-control-zoom a {
+          background-color: white !important;
+          color: #475569 !important;
+          border: 1px solid #e2e8f0 !important;
+          width: 36px !important;
+          height: 36px !important;
+          line-height: 34px !important;
+          font-size: 18px !important;
+          font-weight: 500 !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+          background-color: #f8fafc !important;
+          color: #1e293b !important;
+        }
+      `}</style>
+    </>
+  )
+}

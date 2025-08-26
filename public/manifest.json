@@ -1,0 +1,46 @@
+{
+  "name": "InHerWords - Global Gender Equality Atlas",
+  "short_name": "InHerWords",
+  "description": "Interactive Gender Equality Atlas showcasing women's stories and gender inequality data worldwide",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#c4b5d6",
+  "theme_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "education", "government"],
+  "lang": "en",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-narrow.jpg", 
+      "sizes": "640x1136",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ]
+}

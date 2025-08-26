@@ -1,0 +1,32 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+Disallow: /test/
+
+# Sitemap
+Sitemap: https://inherwords.org/sitemap.xml
+
+# Major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot  
+Allow: /
+
+# Block AI crawlers that don't respect robots.txt
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+# Crawl-delay for general bots
+Crawl-delay: 1
