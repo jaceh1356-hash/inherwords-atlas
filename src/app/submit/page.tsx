@@ -14,91 +14,63 @@ export default function SubmitPage() {
       <SimpleHeader />
 
       {/* Hero Section */}
-      <section className="py-20 px-6" style={{ backgroundColor: '#c4b5d6' }}>
+      <section className="py-12 px-6" style={{ backgroundColor: '#c4b5d6' }}>
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight" style={{ color: '#1a1a1a' }}>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight" style={{ color: '#1a1a1a' }}>
             Share Your Story
           </h1>
 
-          <p className="text-xl max-w-3xl mx-auto leading-relaxed" style={{ color: '#1a1a1a' }}>
+          <p className="text-lg max-w-2xl mx-auto leading-relaxed mb-8" style={{ color: '#1a1a1a' }}>
             Your experience can inspire others, create connections, and contribute to positive
             change. Share your story in a safe, supportive environment.
           </p>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-20 px-6" style={{ backgroundColor: '#c4b5d6' }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Help Others Feel Less Alone */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* Key Benefits - Compact */}
+      <section className="py-12 px-6" style={{ backgroundColor: '#c4b5d6' }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 text-center">
+            <div>
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold mb-4" style={{ color: '#1a1a1a' }}>
-                Help Others Feel Less Alone
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#1a1a1a' }}>
+                Help Others
               </h3>
-              <p className="leading-relaxed" style={{ color: '#1a1a1a' }}>
-                Your story can provide comfort and solidarity to women facing similar challenges.
+              <p className="text-sm" style={{ color: '#1a1a1a' }}>
+                Provide comfort to women facing similar challenges
               </p>
             </div>
 
-            {/* Complete Privacy Protection */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div>
+              <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold mb-4" style={{ color: '#1a1a1a' }}>
-                Complete Privacy Protection
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#1a1a1a' }}>
+                Stay Anonymous
               </h3>
-              <p className="leading-relaxed" style={{ color: '#1a1a1a' }}>
-                Choose to remain anonymous while still sharing your powerful message.
+              <p className="text-sm" style={{ color: '#1a1a1a' }}>
+                Complete privacy protection with secure data handling
               </p>
             </div>
 
-            {/* Create Global Impact */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div>
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold mb-4" style={{ color: '#1a1a1a' }}>
-                Create Global Impact
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#1a1a1a' }}>
+                Create Impact
               </h3>
-              <p className="leading-relaxed" style={{ color: '#1a1a1a' }}>
-                Contribute to a worldwide movement for women's health and rights.
+              <p className="text-sm" style={{ color: '#1a1a1a' }}>
+                Contribute to a worldwide movement for women's rights
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Privacy & Safety Section */}
-      <section className="py-16 px-6" style={{ backgroundColor: '#c4b5d6' }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-4" style={{ color: '#1a1a1a' }}>Your Privacy & Safety</h2>
-            <p className="text-lg" style={{ color: '#1a1a1a' }}>
-              We are committed to protecting your privacy and ensuring a safe space for sharing your story.
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-6">
-              <p className="leading-relaxed mb-4 text-base" style={{ color: '#1a1a1a' }}>
-                All submissions are confidential and you can choose to remain completely anonymous. We follow strict privacy protocols to ensure your personal information is protected and your story is shared only with your explicit consent.
-              </p>
-              <p className="leading-relaxed mb-6 text-base" style={{ color: '#1a1a1a' }}>
-                Your story will help others feel less alone and may contribute to positive change in women's healthcare access worldwide.
-              </p>
-              
-
             </div>
           </div>
         </div>
@@ -173,20 +145,20 @@ function SimpleShareStoryForm() {
   }
 
   return (
-    <section className="py-20 px-6" style={{ backgroundColor: '#c4b5d6' }}>
+    <section className="py-12 px-6" style={{ backgroundColor: '#c4b5d6' }}>
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4" style={{ color: '#1a1a1a' }}>Share Your Story</h2>
-          <p className="max-w-2xl mx-auto" style={{ color: '#1a1a1a' }}>
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold mb-3" style={{ color: '#1a1a1a' }}>Share Your Story</h2>
+          <p className="max-w-2xl mx-auto text-base" style={{ color: '#1a1a1a' }}>
             Take the first step in making your voice heard. Your story matters and can create meaningful change.
           </p>
         </div>
 
-        <div className="rounded-3xl p-8 md:p-12" style={{ backgroundColor: '#f3ecf8' }}>
-          <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="rounded-3xl p-6 md:p-8" style={{ backgroundColor: '#f3ecf8' }}>
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Story Title */}
-            <div className="mb-8">
-              <label htmlFor="title" className="block text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+            <div className="mb-6">
+              <label htmlFor="title" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
                 Story Title *
               </label>
               <input
@@ -201,8 +173,8 @@ function SimpleShareStoryForm() {
             </div>
 
             {/* Your Story */}
-            <div className="mb-8">
-              <label htmlFor="story" className="block text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+            <div className="mb-6">
+              <label htmlFor="story" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
                 Your Story *
               </label>
               <textarea
@@ -217,9 +189,9 @@ function SimpleShareStoryForm() {
             </div>
 
             {/* Category */}
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label htmlFor="category" className="block text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+                <label htmlFor="category" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
                   Category
                 </label>
                 <select
@@ -239,7 +211,7 @@ function SimpleShareStoryForm() {
               </div>
 
               <div>
-                <label htmlFor="ageRange" className="block text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+                <label htmlFor="ageRange" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
                   Age Range
                 </label>
                 <select
@@ -261,9 +233,9 @@ function SimpleShareStoryForm() {
             </div>
 
             {/* Location */}
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label htmlFor="country" className="block text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+                <label htmlFor="country" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
                   Country
                 </label>
                 <input
@@ -277,7 +249,7 @@ function SimpleShareStoryForm() {
               </div>
 
               <div>
-                <label htmlFor="city" className="block text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+                <label htmlFor="city" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
                   City/Region (Optional)
                 </label>
                 <input
@@ -292,10 +264,10 @@ function SimpleShareStoryForm() {
             </div>
 
             {/* Privacy Options */}
-            <div className="mb-10">
-              <h3 className="text-xl font-semibold mb-6" style={{ color: '#1a1a1a' }}>Privacy Settings</h3>
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-4" style={{ color: '#1a1a1a' }}>Privacy Settings</h3>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <label className="flex items-start space-x-4 p-4 rounded-xl border" style={{ backgroundColor: '#f3ecf8', borderColor: '#d1b3e0' }}>
                   <input
                     type="checkbox"
