@@ -98,30 +98,7 @@ export default function SubmitPage() {
                 Your story will help others feel less alone and may contribute to positive change in women's healthcare access worldwide.
               </p>
               
-              <div className="bg-white p-6 rounded-xl border border-teal-200 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold mb-1" style={{ color: '#1a1a1a' }}>
-                      Complete Privacy Documentation
-                    </p>
-                    <p className="text-sm" style={{ color: '#666666' }}>
-                      Review our detailed privacy policies and data protection measures
-                    </p>
-                  </div>
-                  <a 
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSduN_qkl1yr1T1exCvWOzjHXMeeEenbY_3gQ23TDvtS4dxflw/viewform"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-3 rounded-lg font-medium transition-all hover:opacity-90 hover:shadow-md ml-4"
-                    style={{ backgroundColor: '#52a0ac', color: '#fcfcfc' }}
-                  >
-                    View Policy
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -341,7 +318,17 @@ function SimpleShareStoryForm() {
                   />
                   <div>
                     <span className="font-medium" style={{ color: '#1a1a1a' }}>I agree to the terms and conditions *</span>
-                    <p className="text-sm mt-1" style={{ color: '#4a4a4a' }}>I consent to sharing my story and understand the privacy policy</p>
+                    <p className="text-sm mt-1" style={{ color: '#4a4a4a' }}>
+                      I consent to sharing my story and understand the{' '}
+                      <a 
+                        href="https://docs.google.com/forms/d/e/1FAIpQLSduN_qkl1yr1T1exCvWOzjHXMeeEenbY_3gQ23TDvtS4dxflw/viewform"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-teal-600 hover:text-teal-700 underline font-medium"
+                      >
+                        privacy policy
+                      </a>
+                    </p>
                   </div>
                 </label>
               </div>
