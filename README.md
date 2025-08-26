@@ -1,6 +1,34 @@
-# InHerWords - Global Gender Equality Atlas
+# InHerWords - Global Gender E## 📁 Project Structure
 
-An interactive world map that visualizes gender inequality through the Gender Inequality Index (GII) and provides a platform for women to share their stories and experiences.
+```
+inherwords-```
+
+## 🔧 Development
+
+```bash/
+├── src/
+│   ├── app/                    # Next.js app directory
+│   │   ├── page.tsx           # Homepage with interactive map
+│   │   ├── submit/            # Story submission page
+│   │   └── api/               # API routes (Google Sheets)
+│   └── components/            # React components
+│       ├── InteractiveMapClient.tsx  # Main map component
+│       ├── SimpleHeader.tsx          # Navigation header
+│       └── ...
+├── public/                    # Static assets (images, icons)
+├── docs/                     # Documentation
+├── README.md                 # This file
+│
+# Configuration Files
+├── package.json              # Dependencies & scripts
+├── next.config.js           # Next.js configuration
+├── tailwind.config.ts       # Tailwind CSS setup
+├── tsconfig.json           # TypeScript configuration
+├── eslint.config.mjs       # Code linting rules
+├── postcss.config.mjs      # CSS processing
+├── netlify.toml           # Deployment configuration
+└── .env.local.example     # Environment variables template
+``` interactive world map that visualizes gender inequality through the Gender Inequality Index (GII) and provides a platform for women to share their stories and experiences.
 
 ## 🌍 Features
 
