@@ -18,14 +18,20 @@ export default function InteractiveMapClient() {
   // Fetch pins from Google Sheets
   useEffect(() => {
     const fetchPins = async () => {
+      console.log('🔍 Fetching pins from API...')
       try {
         const response = await fetch('/api/map-pins')
+        console.log('📡 API Response status:', response.status)
         const data = await response.json()
+        console.log('📊 API returned data:', data)
         if (data.pins && data.pins.length > 0) {
+          console.log('✅ Setting pins:', data.pins)
           setStoryPins(data.pins)
+        } else {
+          console.log('⚠️ No pins returned, using fallback')
         }
       } catch (error) {
-        console.error('Failed to fetch map pins, using fallback:', error)
+        console.error('❌ Failed to fetch map pins:', error)
         // Keep using fallback pins
       }
     }
