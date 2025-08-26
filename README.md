@@ -28,7 +28,25 @@ Visit the live site: [Your Domain Here]
 - Country boundaries from world.geo.json
 - Story pins represent community-submitted experiences
 
-## 🔧 Development
+## � Project Structure
+
+```
+inherwords-atlas/
+├── src/
+│   ├── app/                  # Next.js app directory
+│   │   ├── page.tsx         # Homepage with interactive map
+│   │   ├── submit/          # Story submission page
+│   │   └── api/             # API routes (Google Sheets)
+│   └── components/          # React components
+│       ├── InteractiveMapClient.tsx  # Main map component
+│       ├── SimpleHeader.tsx          # Navigation header
+│       └── ...
+├── public/                  # Static assets
+├── docs/                   # Documentation
+└── README.md              # This file
+```
+
+## �🔧 Development
 
 ```bash
 # Install dependencies
@@ -36,7 +54,7 @@ npm install
 
 # Set up environment variables
 cp .env.local.example .env.local
-# Follow GOOGLE_SHEETS_SETUP.md for Google Sheets integration
+# See docs/DEPLOYMENT.md for Google Sheets setup
 
 # Start development server
 npm run dev
