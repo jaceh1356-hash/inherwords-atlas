@@ -2,6 +2,37 @@ import { NextRequest, NextResponse } from 'next/server'
 import { GoogleSpreadsheet } from 'google-spreadsheet'
 import { JWT } from 'google-auth-library'
 
+/*
+ * MAP PINS API - HOW TO ADD PINS TO THE MAP
+ * 
+ * This API reads pins from a Google Sheet called "Map Pins" and displays them on the interactive map.
+ * 
+ * TO ADD NEW PINS:
+ * 1. Open your Google Sheet (the one specified in GOOGLE_SHEET_ID environment variable)
+ * 2. Find or create a sheet named "Map Pins" 
+ * 3. The sheet should have these columns:
+ *    - Title: The title/name of the story or organization
+ *    - Latitude: The latitude coordinate (e.g., 40.7128 for NYC)
+ *    - Longitude: The longitude coordinate (e.g., -74.0060 for NYC)
+ *    - Type: Either "story" or "organization"
+ *    - Category: Type of content (e.g., "healthcare", "workplace", "support")
+ *    - Status: Set to "published" to make the pin visible on the map
+ * 
+ * EXAMPLE ROW IN YOUR GOOGLE SHEET:
+ * Title: "Healthcare Access Story from NYC"
+ * Latitude: 40.7128
+ * Longitude: -74.0060
+ * Type: story
+ * Category: healthcare
+ * Status: published
+ * 
+ * GETTING COORDINATES:
+ * - Use Google Maps: Right-click any location and copy the coordinates
+ * - Use https://www.latlong.net/ to find coordinates for any address
+ * 
+ * The pins will automatically appear on the map once you add them to the sheet!
+ */
+
 const serviceAccountAuth = new JWT({
   email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
   key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),

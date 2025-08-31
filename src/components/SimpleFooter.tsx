@@ -1,26 +1,49 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const SimpleFooter: React.FC = () => {
   return (
     <footer className="w-full" style={{ backgroundColor: '#323232' }}>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 pt-4 pb-0">
         <div className="flex justify-between items-center">
-          {/* Left side - empty for spacing */}
-          <div className="flex-1"></div>
+          {/* Left side - Until logo */}
+          <div className="flex-1 flex items-center">
+            <Link 
+              href="https://www.until.org"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                src="/until.png"
+                alt="Until Org"
+                width={100}
+                height={50}
+                className="opacity-80 hover:opacity-100 transition-opacity"
+              />
+            </Link>
+          </div>
           
-          {/* Center - copyright */}
-          <div className="flex-1 text-center">
-            <p className="text-sm" style={{ color: '#fcfcfc' }}>
-              © 2024 In Her Words. All rights reserved.
-            </p>
-            <p className="text-xs mt-1" style={{ color: '#fcfcfc' }}>
-              Created with compassion for women worldwide
-            </p>
+          {/* Center - Logo and copyright in one line */}
+          <div className="flex-1 flex items-center justify-center space-x-3">
+            <Image
+              src="/logo.png"
+              alt="InHerWords Logo"
+              width={32}
+              height={32}
+            />
+            <div className="text-center">
+              <p className="text-sm leading-tight" style={{ color: '#fcfcfc' }}>
+                © 2025 In Her Words. All rights reserved.
+              </p>
+              <p className="text-xs leading-tight" style={{ color: '#fcfcfc' }}>
+                Created with compassion for women worldwide
+              </p>
+            </div>
           </div>
           
           {/* Right side - social icons */}
-          <div className="flex-1 flex justify-end space-x-4">
+          <div className="flex-1 flex justify-end items-center space-x-4">
             <Link 
               href="https://www.instagram.com/untilorg/?hl=en"
               target="_blank"

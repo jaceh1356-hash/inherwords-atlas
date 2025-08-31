@@ -3,6 +3,22 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 
+/*
+ * INTERACTIVE MAP COMPONENT
+ * 
+ * This component displays an interactive world map with pins for stories and organizations.
+ * 
+ * HOW TO ADD PINS TO THE MAP:
+ * 1. Pins are loaded from the Google Sheet "Map Pins" via the /api/map-pins API
+ * 2. To add new pins, edit the Google Sheet directly (see /api/map-pins/route.ts for details)
+ * 3. Set Status to "published" in the sheet to make pins visible
+ * 4. Pins will automatically appear when you refresh the page
+ * 
+ * FALLBACK PINS:
+ * If the Google Sheet is unavailable, the map shows these sample pins below.
+ * You can edit these for testing or as backup content.
+ */
+
 // Fallback pins in case API fails
 const fallbackPins = [
   { lat: 40.7128, lng: -74.0060, type: 'story', title: 'Healthcare Access in NYC', category: 'healthcare' },
@@ -155,10 +171,10 @@ export default function InteractiveMapClient() {
     // Function to get color based on inequality level
     const getColorByLevel = (level: string) => {
       switch(level) {
-        case 'high': return '#fca5a5'    // Very Light Red
-        case 'medium': return '#93c5fd'  // Very Light Blue  
-        case 'low': return '#6ee7b7'     // Very Light Green
-        default: return '#e5e7eb'        // Light gray for countries without data
+        case 'high': return '#dc2626'    // Strong Red
+        case 'medium': return '#f59e0b'  // Strong Orange 
+        case 'low': return '#22c55e'     // Strong Green
+        default: return '#6b7280'        // Gray for countries without data
       }
     }
 
@@ -276,25 +292,25 @@ export default function InteractiveMapClient() {
           <h3 className="font-semibold text-gray-800">Map Legend</h3>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-4">
           {/* Legend Color Scale */}
           <div>
             <h4 className="font-medium text-sm text-gray-700 mb-3">Gender Inequality Index</h4>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#6ee7b7' }}></div>
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#22c55e' }}></div>
                 <span className="text-sm text-gray-600">Low Inequality (0.01-0.15)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#93c5fd' }}></div>
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#f59e0b' }}></div>
                 <span className="text-sm text-gray-600">Medium Inequality (0.16-0.39)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#fca5a5' }}></div>
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#dc2626' }}></div>
                 <span className="text-sm text-gray-600">High Inequality (0.40+)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#e5e7eb' }}></div>
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#6b7280' }}></div>
                 <span className="text-sm text-gray-600">No Data Available</span>
               </div>
             </div>
@@ -302,13 +318,13 @@ export default function InteractiveMapClient() {
 
           {/* GII Information */}
           <div>
-            <h4 className="font-medium text-sm text-gray-700 mb-3">About the GII</h4>
+            <h4 className="font-medium text-sm text-gray-700 mb-1">About the GII</h4>
             <p className="text-xs text-gray-600 leading-relaxed">
               The Gender Inequality Index (GII) measures inequality between women and men in three dimensions: 
               reproductive health, empowerment, and labor market participation. Values range from 0 (perfect equality) 
               to 1 (complete inequality). Higher values indicate greater disparities between women and men's achievements.
             </p>
-            <p className="text-xs text-gray-500 mt-2 italic">
+            <p className="text-xs text-gray-500 mt-1 italic">
               Data source: UN Human Development Reports
             </p>
           </div>

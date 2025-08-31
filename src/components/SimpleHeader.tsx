@@ -39,7 +39,7 @@ export default function SimpleHeader() {
             href="/submit"
             className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all font-medium shadow-sm hover:shadow-md hover:opacity-90"
             style={{ 
-              backgroundColor: '#52a0ac', 
+              backgroundColor: '#0f7c7c', 
               color: '#fcfcfc'
             }}
             aria-label="Share your story and contribute to the movement"

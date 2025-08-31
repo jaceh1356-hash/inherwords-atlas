@@ -62,10 +62,16 @@
 
   html {
     scroll-behavior: smooth;
+    margin: 0;
+    padding: 0;
+    height: 100%;
   }
 
   body {
     font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -80,24 +86,33 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Add padding for fixed header */
+  body {
+    padding-top: 0;
+  }
+  
+  .main-content {
+    padding-top: 80px;
+  }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar with default colors */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c1c1c1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #a8a8a8;
 }
 
 /* Map Styles */
@@ -115,7 +130,7 @@
 .pushpin-head {
   width: 20px;
   height: 20px;
-  background: #14b8a6;
+  background: #0f7c7c;
   border: 3px solid white;
   border-radius: 50%;
   position: absolute;
@@ -129,7 +144,7 @@
 .pushpin-needle {
   width: 2px;
   height: 18px;
-  background: #14b8a6;
+  background: #0f7c7c;
   position: absolute;
   top: 17px;
   left: 50%;
@@ -138,7 +153,7 @@
 
 .custom-marker:hover .pushpin-head {
   transform: translateX(-50%) scale(1.1);
-  background: #0d9488;
+  background: #0a5a5a;
 }
 
 .custom-popup {

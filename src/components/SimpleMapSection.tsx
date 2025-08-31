@@ -2,10 +2,10 @@ import InteractiveMap from './InteractiveMap'
 
 export default function SimpleMapSection() {
   return (
-    <section className="py-16 px-6" style={{ backgroundColor: '#c4b5d6' }}>
+    <section className="py-12 px-6" style={{ backgroundColor: '#c4b5d6' }}>
       <div className="max-w-6xl mx-auto">
         {/* Section Title */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-wide" style={{ color: '#323232' }}>
             Explore Stories & Support
           </h2>
