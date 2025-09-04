@@ -22,6 +22,18 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const router = useRouter()
 
+  const fetchStories = async () => {
+    try {
+      const response = await fetch('/api/admin/stories')
+      const data = await response.json()
+      setStories(data.stories || [])
+    } catch (error) {
+      console.error('Failed to fetch stories:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const checkAuth = useCallback(async () => {
     const token = localStorage.getItem('admin_token')
     
@@ -56,18 +68,6 @@ export default function AdminPage() {
   const logout = () => {
     localStorage.removeItem('admin_token')
     router.push('/admin/login')
-  }
-
-  const fetchStories = async () => {
-    try {
-      const response = await fetch('/api/admin/stories')
-      const data = await response.json()
-      setStories(data.stories || [])
-    } catch (error) {
-      console.error('Failed to fetch stories:', error)
-    } finally {
-      setLoading(false)
-    }
   }
 
   const addToMap = async (story: Story) => {
