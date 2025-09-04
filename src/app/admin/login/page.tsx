@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function AdminLogin() {
   const [identifier, setIdentifier] = useState('')
@@ -101,13 +102,13 @@ export default function AdminLogin() {
           </form>
 
           <div className="mt-6 text-center">
-            <a
+            <Link
               href="/"
               className="text-sm hover:underline"
               style={{ color: '#0f7c7c' }}
             >
               ← Back to main site
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Story {
@@ -22,11 +22,7 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const router = useRouter()
 
-  useEffect(() => {
-    checkAuth()
-  }, [])
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     const token = localStorage.getItem('admin_token')
     
     if (!token) {
@@ -41,6 +37,7 @@ export default function AdminPage() {
 
       if (response.ok) {
         setIsAuthenticated(true)
+        setLoading(false)
         fetchStories()
       } else {
         localStorage.removeItem('admin_token')
@@ -50,7 +47,11 @@ export default function AdminPage() {
       localStorage.removeItem('admin_token')
       router.push('/admin/login')
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
 
   const logout = () => {
     localStorage.removeItem('admin_token')

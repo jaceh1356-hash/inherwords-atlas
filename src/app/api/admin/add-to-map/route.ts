@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add new pin (avoid duplicates)
-    const existingIndex = pins.findIndex((pin: any) => pin.id === storyId)
+    const existingIndex = pins.findIndex((pin: { id: string }) => pin.id === storyId)
     if (existingIndex >= 0) {
       pins[existingIndex] = newPin // Update existing
     } else {
