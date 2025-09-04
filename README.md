@@ -6,6 +6,8 @@ An interactive world map that visualizes gender inequality through the Gender In
 
 - **Interactive World Map**: Explore countries colored by their Gender Inequality Index scores
 - **Story Sharing**: Submit personal stories and experiences in a safe, supportive environment
+- **Admin Dashboard**: Secure admin interface for story approval and map pin management
+- **Real-time Updates**: Stories appear as map pins immediately after approval
 - **Data Visualization**: Clear legend and information about the Gender Inequality Index
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Privacy-Focused**: Anonymous sharing options and secure data handling
@@ -14,18 +16,48 @@ An interactive world map that visualizes gender inequality through the Gender In
 
 Visit the live site: https://inherwords.vercel.app
 
+## 🔑 Admin Access
+
+- **Admin Login**: `/admin/login`
+- **Admin Dashboard**: `/admin` (requires authentication)
+
 ## 🛠 Technology Stack
 
 - **Frontend**: Next.js 15, React 18, TypeScript
 - **Styling**: Tailwind CSS
 - **Mapping**: Leaflet with custom choropleth visualization
-- **Data Storage**: Google Sheets integration
+- **Authentication**: JWT tokens
+- **Data Storage**: Local JSON files for map pins, Google Sheets for story submissions
+
+## 🚀 Deployment on Vercel
+
+### Environment Variables Required:
+
+```env
+ADMIN_USERNAME=your_admin_username
+ADMIN_PASSWORD=your_secure_password
+JWT_SECRET=your-jwt-secret-key-change-this-in-production
+```
+
+### Setup Instructions:
+
+1. **Deploy to Vercel**: Connect your GitHub repository to Vercel
+2. **Set Environment Variables**: In Vercel dashboard → Settings → Environment Variables, add:
+   - `ADMIN_USERNAME`: Your admin username
+   - `ADMIN_PASSWORD`: Your secure admin password  
+   - `JWT_SECRET`: A secure random string for JWT token signing
+3. **Redeploy**: Trigger a new deployment after adding environment variables
+
+### Admin Access After Deployment:
+- Visit `https://your-app.vercel.app/admin/login`
+- Use the credentials you set in environment variables
+- Access the admin dashboard to approve stories and manage map pins
 
 ## 📊 Data Sources
 
 - Gender Inequality Index data from UN Human Development Reports
 - Country boundaries from world.geo.json
-- Story pins represent community-submitted experiences
+- Story pins stored in local JSON file and managed through admin interface
 
 ## 📁 Project Structure
 
@@ -35,24 +67,22 @@ inherwords-atlas/
 │   ├── app/                    # Next.js app directory
 │   │   ├── page.tsx           # Homepage with interactive map
 │   │   ├── submit/            # Story submission page
-│   │   └── api/               # API routes (Google Sheets)
-│   └── components/            # React components
-│       ├── InteractiveMapClient.tsx  # Main map component
-│       ├── SimpleHeader.tsx          # Navigation header
-│       └── ...
+│   │   ├── admin/             # Admin interface
+│   │   │   ├── login/         # Admin login page
+│   │   │   └── page.tsx       # Admin dashboard
+│   │   └── api/               # API routes
+│   │       ├── map-pins/      # Map pin data
+│   │       ├── submit-story/  # Story submissions
+│   │       └── admin/         # Admin API endpoints
+│   ├── components/            # React components
+│   │   ├── InteractiveMapClient.tsx  # Main map component
+│   │   ├── SimpleHeader.tsx          # Navigation header
+│   │   └── ...
+│   └── data/                  # Local data storage
+│       └── map-pins.json      # Approved story pins
 ├── public/                    # Static assets (images, icons)
-├── docs/                     # Documentation
-├── README.md                 # This file
-│
-# Configuration Files
-├── package.json              # Dependencies & scripts
-├── next.config.js           # Next.js configuration
-├── tailwind.config.ts       # Tailwind CSS setup
-├── tsconfig.json           # TypeScript configuration
-├── eslint.config.mjs       # Code linting rules
-├── postcss.config.mjs      # CSS processing
-├── netlify.toml           # Deployment configuration
-└── .env.local.example     # Environment variables template
+├── .env.example              # Environment variables template
+└── README.md                 # This file
 ```
 
 ## 🔧 Development
