@@ -86,29 +86,6 @@ export default function InteractiveMapClient() {
       maxZoom: 19
     }).addTo(leafletMap.current)
 
-    // Create custom pushpin icon (same for both stories and organizations)
-    const pushpinIcon = L.divIcon({
-      className: 'custom-marker',
-      html: '<div class="pushpin-container"><div class="pushpin-head"></div><div class="pushpin-needle"></div></div>',
-      iconSize: [26, 38],
-      iconAnchor: [13, 38]
-    })
-
-    // Add story pins to the map
-    storyPins.forEach(pin => {
-      const marker = L.marker([pin.lat, pin.lng], { icon: pushpinIcon })
-        .addTo(leafletMap.current!)
-
-      // Add popup with story/organization info
-      marker.bindPopup(`
-        <div class="custom-popup">
-          <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
-          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? 'Personal Story' : 'Support Organization'}</p>
-          <span class="inline-block px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">${pin.category}</span>
-        </div>
-      `)
-    })
-
     // Gender Inequality Index data - using exact country names from GeoJSON
     const giiData: Record<string, { value: number; level: string }> = {
       // High Inequality Countries (Red)
@@ -278,6 +255,44 @@ export default function InteractiveMapClient() {
       }
     }
   }, [])
+
+  // Separate useEffect for adding/updating pins when storyPins changes
+  useEffect(() => {
+    if (!leafletMap.current) return
+
+    console.log('🔄 Updating pins on map. Pin count:', storyPins.length)
+
+    // Clear existing markers first (if we're updating)
+    leafletMap.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        leafletMap.current!.removeLayer(layer)
+      }
+    })
+
+    // Create custom pushpin icon
+    const pushpinIcon = L.divIcon({
+      className: 'custom-marker',
+      html: '<div class="pushpin-container"><div class="pushpin-head"></div><div class="pushpin-needle"></div></div>',
+      iconSize: [26, 38],
+      iconAnchor: [13, 38]
+    })
+
+    // Add all pins to the map
+    storyPins.forEach(pin => {
+      console.log('📍 Adding pin:', pin.title, 'at', pin.lat, pin.lng)
+      const marker = L.marker([pin.lat, pin.lng], { icon: pushpinIcon })
+        .addTo(leafletMap.current!)
+
+      // Add popup with story/organization info
+      marker.bindPopup(`
+        <div class="custom-popup">
+          <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
+          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? 'Personal Story' : 'Support Organization'}</p>
+          <span class="inline-block px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">${pin.category}</span>
+        </div>
+      `)
+    })
+  }, [storyPins]) // Re-run when storyPins changes
 
   return (
     <>

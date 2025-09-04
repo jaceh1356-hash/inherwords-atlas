@@ -17,40 +17,36 @@ export async function POST(request: NextRequest) {
     await doc.loadInfo()
 
     // Get or create the worksheet
-    let sheet = doc.sheetsByIndex[0]
+    // Get or create Form Submissions sheet
+    let sheet = doc.sheetsByTitle['Form Submissions']
     if (!sheet) {
-      sheet = await doc.addSheet({ title: 'Story Submissions' })
-    }
-
-    // Set headers if this is the first row
-    const rows = await sheet.getRows()
-    if (rows.length === 0) {
-      await sheet.setHeaderRow([
-        'Timestamp',
-        'Title',
-        'Story',
-        'Category',
-        'Age Range',
-        'Country',
-        'City',
-        'Anonymous',
-        'Agreed to Terms',
-        'Status'
-      ])
+      sheet = await doc.addSheet({ 
+        title: 'Form Submissions',
+        headerValues: [
+          'Submitted At',
+          'Story Title',
+          'Story',
+          'Email',
+          'Country',
+          'City',
+          'Anonymous',
+          'Agreed to Terms',
+          'Status'
+        ]
+      })
     }
 
     // Add the new row
     await sheet.addRow({
-      'Timestamp': new Date().toISOString(),
-      'Title': formData.title,
+      'Submitted At': new Date().toISOString(),
+      'Story Title': formData.title,
       'Story': formData.story,
-      'Category': formData.category,
-      'Age Range': formData.ageRange,
+      'Email': formData.email || '',
       'Country': formData.country,
       'City': formData.city || '',
-      'Anonymous': formData.anonymous ? 'Yes' : 'No',
-      'Agreed to Terms': formData.agreedToTerms ? 'Yes' : 'No',
-      'Status': 'Pending Review'
+      'Anonymous': formData.anonymous ? 'true' : 'false',
+      'Agreed to Terms': formData.agreedToTerms ? 'true' : 'false',
+      'Status': 'pending'
     })
 
     return NextResponse.json({ 

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sample_1",
+    "title": "Healthcare Access Story",
+    "lat": 40.7128,
+    "lng": -74.006,
+    "type": "story",
+    "category": "healthcare",
+    "country": "United States",
+    "city": "New York"
+  },
+  {
+    "id": "sample_2",
+    "title": "Workplace Rights Campaign",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "type": "story",
+    "category": "workplace",
+    "country": "United Kingdom",
+    "city": "London"
+  },
+  {
+    "id": "sample_3",
+    "title": "Education Equality Initiative",
+    "lat": 48.8566,
+    "lng": 2.3522,
+    "type": "story",
+    "category": "education",
+    "country": "France",
+    "city": "Paris"
+  },
+  {
+    "id": "story_3",
+    "title": "Test",
+    "lat": 19.054999,
+    "lng": 72.8692035,
+    "type": "story",
+    "category": "story",
+    "country": "India",
+    "city": "Mumbai "
+  }
+]
