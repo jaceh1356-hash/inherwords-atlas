@@ -123,6 +123,43 @@ export default function AdminPage() {
     }
   }
 
+  const removeFromMap = async (story: Story) => {
+    if (!confirm(`Are you sure you want to remove "${story.title}" from the map?`)) {
+      return
+    }
+
+    setProcessingId(story.id)
+    try {
+      const response = await fetch('/api/admin/remove-from-map', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          storyId: story.id
+        })
+      })
+
+      if (response.ok) {
+        // Update story status back to approved
+        await fetch('/api/admin/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storyId: story.id, status: 'approved' })
+        })
+        
+        fetchStories()
+        alert('✅ Story removed from map!')
+      } else {
+        const errorData = await response.json()
+        alert(`❌ Failed to remove story from map: ${errorData.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error removing from map:', error)
+      alert('❌ Error removing story from map')
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
   const approveAndAddToMap = async (story: Story) => {
     setProcessingId(story.id)
     try {
@@ -307,9 +344,18 @@ export default function AdminPage() {
                     )}
 
                     {story.status === 'on-map' && (
-                      <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-center">
-                        ✅ On Map
-                      </div>
+                      <>
+                        <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-center mb-2">
+                          ✅ On Map
+                        </div>
+                        <button
+                          onClick={() => removeFromMap(story)}
+                          disabled={processingId === story.id}
+                          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+                        >
+                          {processingId === story.id ? 'Removing...' : '🗑️ Remove from Map'}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
