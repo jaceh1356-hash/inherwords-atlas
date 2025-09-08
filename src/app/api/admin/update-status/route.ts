@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sql } from '@vercel/postgres'
 
+// Force Vercel redeploy - 2025-09-08
 export async function POST(request: NextRequest) {
   try {
     const { storyId, status } = await request.json()
