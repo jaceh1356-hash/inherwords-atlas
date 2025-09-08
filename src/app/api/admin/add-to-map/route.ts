@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { sql } from '@vercel/postgres'
 
 // Simple geocoding function with fallback
 async function getCoordinates(city: string, country: string): Promise<{ lat: number; lng: number } | null> {
@@ -64,11 +65,23 @@ export async function POST(request: NextRequest) {
   try {
     const { storyId, title, country, city, category } = await request.json()
 
+    console.log('🔄 Adding to map:', { storyId, title, country, city, category })
+
+    // Validate required fields
+    if (!storyId || !title || !country) {
+      console.error('❌ Missing required fields:', { storyId, title, country })
+      return NextResponse.json({ error: 'Missing required fields: storyId, title, and country are required' }, { status: 400 })
+    }
+
     // Get coordinates for the location
+    console.log('🌍 Getting coordinates for:', city ? `${city}, ${country}` : country)
     const coordinates = await getCoordinates(city || '', country)
     if (!coordinates) {
+      console.error('❌ Could not find coordinates for location')
       return NextResponse.json({ error: 'Could not find coordinates for location' }, { status: 400 })
     }
+
+    console.log('📍 Coordinates found:', coordinates)
 
     // Create new pin object
     const newPin = {
@@ -82,35 +95,57 @@ export async function POST(request: NextRequest) {
       city: city || ''
     }
 
-    // Read existing pins
-    const filePath = path.join(process.cwd(), 'src/data/map-pins.json')
-    let pins = []
-    
-    try {
-      const fileContents = await fs.readFile(filePath, 'utf8')
-      pins = JSON.parse(fileContents)
-    } catch (error) {
-      // File doesn't exist yet, start with empty array
-      console.log('Creating new map-pins.json file')
-    }
-
-    // Add new pin (avoid duplicates)
-    const existingIndex = pins.findIndex((pin: { id: string }) => pin.id === storyId)
-    if (existingIndex >= 0) {
-      pins[existingIndex] = newPin // Update existing
+    if (process.env.NODE_ENV === 'production') {
+      // Production: Use Vercel Postgres database
+      try {
+        await sql`
+          INSERT INTO map_pins (id, title, lat, lng, type, category, country, city)
+          VALUES (${storyId}, ${title}, ${coordinates.lat}, ${coordinates.lng}, 'story', ${category || 'general'}, ${country}, ${city || ''})
+          ON CONFLICT (id) DO UPDATE SET 
+            title = EXCLUDED.title,
+            lat = EXCLUDED.lat,
+            lng = EXCLUDED.lng,
+            category = EXCLUDED.category,
+            country = EXCLUDED.country,
+            city = EXCLUDED.city
+        `
+        
+        console.log(`✅ Added pin to database for ${title} at ${coordinates.lat}, ${coordinates.lng}`)
+        return NextResponse.json({ success: true, coordinates, pin: newPin })
+      } catch (dbError) {
+        console.error('❌ Database error:', dbError)
+        return NextResponse.json({ error: 'Failed to save pin to database' }, { status: 500 })
+      }
     } else {
-      pins.push(newPin) // Add new
+      // Local development: Use file system
+      const filePath = path.join(process.cwd(), 'src/data/map-pins.json')
+      let pins = []
+      
+      try {
+        const fileContents = await fs.readFile(filePath, 'utf8')
+        pins = JSON.parse(fileContents)
+      } catch (error) {
+        console.log('Creating new map-pins.json file')
+      }
+
+      // Add new pin (avoid duplicates)
+      const existingIndex = pins.findIndex((pin: { id: string }) => pin.id === storyId)
+      if (existingIndex >= 0) {
+        pins[existingIndex] = newPin // Update existing
+      } else {
+        pins.push(newPin) // Add new
+      }
+
+      // Write back to file
+      await fs.writeFile(filePath, JSON.stringify(pins, null, 2))
+      
+      console.log(`✅ Added pin for ${title} at ${coordinates.lat}, ${coordinates.lng}`)
+      console.log(`📊 Total pins: ${pins.length}`)
+
+      return NextResponse.json({ success: true, coordinates, pin: newPin })
     }
-
-    // Write back to file
-    await fs.writeFile(filePath, JSON.stringify(pins, null, 2))
-    
-    console.log(`Added pin for ${title} at ${coordinates.lat}, ${coordinates.lng}`)
-    console.log(`Total pins: ${pins.length}`)
-
-    return NextResponse.json({ success: true, coordinates, pin: newPin })
   } catch (error) {
-    console.error('Error adding to map:', error)
-    return NextResponse.json({ error: 'Failed to add to map' }, { status: 500 })
+    console.error('❌ Error adding to map:', error)
+    return NextResponse.json({ error: 'Failed to add to map', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 }

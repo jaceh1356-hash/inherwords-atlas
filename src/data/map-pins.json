@@ -38,5 +38,35 @@
     "category": "story",
     "country": "India",
     "city": "Mumbai "
+  },
+  {
+    "id": "test_123",
+    "title": "Test Story",
+    "lat": 40.7127281,
+    "lng": -74.0060152,
+    "type": "story",
+    "category": "story",
+    "country": "United States",
+    "city": "New York"
+  },
+  {
+    "id": "test_api_123",
+    "title": "API Test Story",
+    "lat": 48.8534951,
+    "lng": 2.3483915,
+    "type": "story",
+    "category": "story",
+    "country": "France",
+    "city": "Paris"
+  },
+  {
+    "id": "story_4",
+    "title": "Melissa Test",
+    "lat": 37.3361663,
+    "lng": -121.890591,
+    "type": "story",
+    "category": "story",
+    "country": "United States",
+    "city": "SAN JOSE"
   }
 ]

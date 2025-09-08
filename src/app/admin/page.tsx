@@ -140,7 +140,10 @@ export default function AdminPage() {
       // Then add to map
       const mapResponse = await fetch('/api/admin/add-to-map', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+        },
         body: JSON.stringify({
           storyId: story.id,
           title: story.title,
@@ -151,10 +154,17 @@ export default function AdminPage() {
       })
 
       if (mapResponse.ok) {
+        const result = await mapResponse.json()
         fetchStories()
-        alert('✅ Story approved and added to map!')
+        if (result.warning) {
+          alert(`⚠️ Story approved and coordinates found, but pin not persisted in production.\n\nDatabase integration needed for full functionality.`)
+        } else {
+          alert('✅ Story approved and added to map!')
+        }
       } else {
-        alert('❌ Story approved but failed to add to map')
+        const errorData = await mapResponse.json()
+        console.error('Map API error:', errorData)
+        alert(`❌ Story approved but failed to add to map: ${errorData.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error in approve and add to map:', error)
