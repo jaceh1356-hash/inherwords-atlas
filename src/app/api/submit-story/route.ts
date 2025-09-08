@@ -1,58 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleSpreadsheet } from 'google-spreadsheet'
-import { JWT } from 'google-auth-library'
+import { sql } from '@vercel/postgres'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.json()
     
-    // Initialize Google Sheets connection
-    const serviceAccountAuth = new JWT({
-      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    })
-
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, serviceAccountAuth)
-    await doc.loadInfo()
-
-    // Get or create the worksheet
-    // Get or create Form Submissions sheet
-    let sheet = doc.sheetsByTitle['Form Submissions']
-    if (!sheet) {
-      sheet = await doc.addSheet({ 
-        title: 'Form Submissions',
-        headerValues: [
-          'Submitted At',
-          'Story Title',
-          'Story',
-          'Email',
-          'Country',
-          'City',
-          'Anonymous',
-          'Agreed to Terms',
-          'Status'
-        ]
-      })
+    // Validate required fields
+    if (!formData.title || !formData.story || !formData.country) {
+      return NextResponse.json(
+        { success: false, message: 'Please fill in all required fields.' },
+        { status: 400 }
+      )
     }
 
-    // Add the new row
-    await sheet.addRow({
-      'Submitted At': new Date().toISOString(),
-      'Story Title': formData.title,
-      'Story': formData.story,
-      'Email': formData.email || '',
-      'Country': formData.country,
-      'City': formData.city || '',
-      'Anonymous': formData.anonymous ? 'true' : 'false',
-      'Agreed to Terms': formData.agreedToTerms ? 'true' : 'false',
-      'Status': 'pending'
-    })
+    const storyId = `story_${uuidv4()}`
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Story submitted successfully! It will be reviewed before being added to the map.' 
-    })
+    if (process.env.NODE_ENV === 'production') {
+      // Production: Save to Vercel Postgres database
+      try {
+        await sql`
+          INSERT INTO stories (id, title, story, country, city, email, anonymous, status, submitted_at)
+          VALUES (
+            ${storyId},
+            ${formData.title},
+            ${formData.story},
+            ${formData.country},
+            ${formData.city || ''},
+            ${formData.email || ''},
+            ${formData.anonymous || false},
+            'pending',
+            NOW()
+          )
+        `
+        
+        console.log(`✅ Story submitted to database: ${storyId}`)
+        
+        return NextResponse.json({ 
+          success: true, 
+          message: 'Story submitted successfully! It will be reviewed before being added to the map.',
+          storyId
+        })
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        return NextResponse.json(
+          { success: false, message: 'Failed to submit story. Please try again.' },
+          { status: 500 }
+        )
+      }
+    } else {
+      // Local development: You can add local storage here
+      console.log('Development mode: Story would be saved to database in production')
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Story submitted successfully! (Development mode)',
+        storyId
+      })
+    }
 
   } catch (error) {
     console.error('Error submitting story:', error instanceof Error ? error.message : 'Unknown error')

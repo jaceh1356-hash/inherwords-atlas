@@ -11,6 +11,20 @@ CREATE TABLE IF NOT EXISTS map_pins (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create stories table
+CREATE TABLE IF NOT EXISTS stories (
+  id VARCHAR(255) PRIMARY KEY,
+  title TEXT NOT NULL,
+  story TEXT NOT NULL,
+  country VARCHAR(100) NOT NULL,
+  city VARCHAR(100),
+  email VARCHAR(255),
+  anonymous BOOLEAN DEFAULT FALSE,
+  status VARCHAR(50) DEFAULT 'pending',
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert sample pins
 INSERT INTO map_pins (id, title, lat, lng, type, category, country, city) VALUES
 ('sample_1', 'Healthcare Access Story', 40.7128, -74.006, 'story', 'healthcare', 'United States', 'New York'),

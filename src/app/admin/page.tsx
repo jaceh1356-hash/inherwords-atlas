@@ -17,6 +17,8 @@ interface Story {
 
 export default function AdminPage() {
   const [stories, setStories] = useState<Story[]>([])
+  const [currentPins, setCurrentPins] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<'stories' | 'pins'>('stories')
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -26,11 +28,24 @@ export default function AdminPage() {
     try {
       const response = await fetch('/api/admin/stories')
       const data = await response.json()
+      console.log('API Response:', data) // Debug log
+      console.log('Stories:', data.stories) // Debug log
       setStories(data.stories || [])
     } catch (error) {
       console.error('Failed to fetch stories:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCurrentPins = async () => {
+    try {
+      const response = await fetch('/api/map-pins')
+      const data = await response.json()
+      console.log('Current pins:', data.pins)
+      setCurrentPins(data.pins || [])
+    } catch (error) {
+      console.error('Failed to fetch current pins:', error)
     }
   }
 
@@ -51,6 +66,7 @@ export default function AdminPage() {
         setIsAuthenticated(true)
         setLoading(false)
         fetchStories()
+        fetchCurrentPins()
       } else {
         localStorage.removeItem('admin_token')
         router.push('/admin/login')
@@ -88,6 +104,7 @@ export default function AdminPage() {
       if (response.ok) {
         // Refresh the stories list
         fetchStories()
+        fetchCurrentPins()
         alert('✅ Story added to map successfully!')
       } else {
         alert('❌ Failed to add story to map')
@@ -147,6 +164,7 @@ export default function AdminPage() {
         })
         
         fetchStories()
+        fetchCurrentPins()
         alert('✅ Story removed from map!')
       } else {
         const errorData = await response.json()
@@ -193,6 +211,7 @@ export default function AdminPage() {
       if (mapResponse.ok) {
         const result = await mapResponse.json()
         fetchStories()
+        fetchCurrentPins()
         if (result.warning) {
           alert(`⚠️ Story approved and coordinates found, but pin not persisted in production.\n\nDatabase integration needed for full functionality.`)
         } else {
@@ -232,7 +251,7 @@ export default function AdminPage() {
               Story Admin Panel
             </h1>
             <p className="text-lg" style={{ color: '#1a1a1a' }}>
-              Review submitted stories and add them to the map
+              Review submitted stories and manage map pins
             </p>
           </div>
           
@@ -244,123 +263,217 @@ export default function AdminPage() {
           </button>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="flex space-x-1 mb-8 bg-white/20 p-1 rounded-lg">
+          <button
+            onClick={() => setActiveTab('stories')}
+            className={`px-6 py-3 rounded-md transition-all font-medium ${
+              activeTab === 'stories'
+                ? 'bg-white text-purple-700 shadow-sm'
+                : 'text-gray-700 hover:text-gray-900'
+            }`}
+          >
+            📝 Stories ({stories.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('pins')}
+            className={`px-6 py-3 rounded-md transition-all font-medium ${
+              activeTab === 'pins'
+                ? 'bg-white text-purple-700 shadow-sm'
+                : 'text-gray-700 hover:text-gray-900'
+            }`}
+          >
+            📍 Current Pins ({currentPins.length})
+          </button>
+        </div>
+
+        {/* Content */}
         <div className="grid gap-6">
-          {stories.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-lg" style={{ color: '#1a1a1a' }}>No stories submitted yet</p>
-            </div>
-          ) : (
-            stories.map((story) => (
-              <div
-                key={story.id}
-                className="rounded-xl p-6 shadow-lg"
-                style={{ backgroundColor: '#f3ecf8' }}
-              >
-                <div className="grid lg:grid-cols-3 gap-6">
-                  {/* Story Info */}
-                  <div className="lg:col-span-2">
-                    <div className="flex items-center gap-4 mb-4">
-                      <h3 className="text-xl font-bold" style={{ color: '#1a1a1a' }}>
-                        {story.title}
-                      </h3>
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          story.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : story.status === 'approved'
-                            ? 'bg-green-100 text-green-800'
-                            : story.status === 'on-map'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {story.status}
-                      </span>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <strong>Location:</strong> {story.city ? `${story.city}, ` : ''}{story.country}
-                    </div>
-                    
-                    <div className="mb-4">
-                      <strong>Story:</strong>
-                      <p className="mt-2 text-sm leading-relaxed" style={{ color: '#4a4a4a' }}>
-                        {story.story.length > 300 
-                          ? `${story.story.substring(0, 300)}...` 
-                          : story.story
-                        }
-                      </p>
-                    </div>
-
-                    {story.email && !story.anonymous && (
-                      <div className="mb-4">
-                        <strong>Contact:</strong> {story.email}
+          {activeTab === 'stories' ? (
+            // Stories Tab
+            stories.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-lg" style={{ color: '#1a1a1a' }}>No stories submitted yet</p>
+              </div>
+            ) : (
+              stories.map((story) => (
+                <div
+                  key={story.id}
+                  className="rounded-xl p-6 shadow-lg"
+                  style={{ backgroundColor: '#f3ecf8' }}
+                >
+                  <div className="grid lg:grid-cols-3 gap-6">
+                    {/* Story Info */}
+                    <div className="lg:col-span-2">
+                      <div className="flex items-center gap-4 mb-4">
+                        <h3 className="text-xl font-bold" style={{ color: '#1a1a1a' }}>
+                          {story.title}
+                        </h3>
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            story.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : story.status === 'approved'
+                              ? 'bg-green-100 text-green-800'
+                              : story.status === 'on-map'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {story.status}
+                        </span>
                       </div>
-                    )}
+                      
+                      <div className="mb-4">
+                        <strong>Location:</strong> {story.city ? `${story.city}, ` : ''}{story.country}
+                      </div>
+                      
+                      <div className="mb-4">
+                        <strong>Story:</strong>
+                        <p className="mt-2 text-sm leading-relaxed" style={{ color: '#4a4a4a' }}>
+                          {story.story && story.story.trim() 
+                            ? (story.story.length > 300 
+                                ? `${story.story.substring(0, 300)}...` 
+                                : story.story)
+                            : <em style={{ color: '#888' }}>No story content provided</em>
+                          }
+                        </p>
+                      </div>
 
-                    <div className="text-sm" style={{ color: '#6b7280' }}>
-                      Submitted: {new Date(story.submittedAt).toLocaleDateString()}
+                      {story.email && !story.anonymous && (
+                        <div className="mb-4">
+                          <strong>Contact:</strong> {story.email}
+                        </div>
+                      )}
+
+                      <div className="text-sm" style={{ color: '#6b7280' }}>
+                        Submitted: {new Date(story.submittedAt).toLocaleDateString()}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex flex-col gap-3">
-                    {story.status === 'pending' && (
-                      <>
+                    {/* Actions */}
+                    <div className="flex flex-col gap-3">
+                      {story.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => approveAndAddToMap(story)}
+                            disabled={processingId === story.id}
+                            className="px-4 py-2 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+                            style={{ backgroundColor: '#0f7c7c' }}
+                          >
+                            {processingId === story.id ? 'Processing...' : '✅ Approve & Add to Map'}
+                          </button>
+                          <button
+                            onClick={() => updateStatus(story.id, 'approved')}
+                            disabled={processingId === story.id}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                          >
+                            {processingId === story.id ? 'Processing...' : '✅ Approve Only'}
+                          </button>
+                          <button
+                            onClick={() => updateStatus(story.id, 'rejected')}
+                            disabled={processingId === story.id}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {processingId === story.id ? 'Processing...' : '❌ Reject'}
+                          </button>
+                        </>
+                      )}
+
+                      {story.status === 'approved' && (
                         <button
-                          onClick={() => approveAndAddToMap(story)}
+                          onClick={() => addToMap(story)}
                           disabled={processingId === story.id}
                           className="px-4 py-2 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
                           style={{ backgroundColor: '#0f7c7c' }}
                         >
-                          {processingId === story.id ? 'Processing...' : '✅ Approve & Add to Map'}
+                          {processingId === story.id ? 'Adding...' : '📍 Add to Map'}
                         </button>
-                        <button
-                          onClick={() => updateStatus(story.id, 'approved')}
-                          disabled={processingId === story.id}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-                        >
-                          {processingId === story.id ? 'Processing...' : '✅ Approve Only'}
-                        </button>
-                        <button
-                          onClick={() => updateStatus(story.id, 'rejected')}
-                          disabled={processingId === story.id}
-                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-                        >
-                          {processingId === story.id ? 'Processing...' : '❌ Reject'}
-                        </button>
-                      </>
-                    )}
+                      )}
 
-                    {story.status === 'approved' && (
-                      <button
-                        onClick={() => addToMap(story)}
-                        disabled={processingId === story.id}
-                        className="px-4 py-2 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
-                        style={{ backgroundColor: '#0f7c7c' }}
-                      >
-                        {processingId === story.id ? 'Adding...' : '📍 Add to Map'}
-                      </button>
-                    )}
-
-                    {story.status === 'on-map' && (
-                      <>
-                        <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-center mb-2">
-                          ✅ On Map
-                        </div>
-                        <button
-                          onClick={() => removeFromMap(story)}
-                          disabled={processingId === story.id}
-                          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
-                        >
-                          {processingId === story.id ? 'Removing...' : '🗑️ Remove from Map'}
-                        </button>
-                      </>
-                    )}
+                      {story.status === 'on-map' && (
+                        <>
+                          <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-center mb-2">
+                            ✅ On Map
+                          </div>
+                          <button
+                            onClick={() => removeFromMap(story)}
+                            disabled={processingId === story.id}
+                            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+                          >
+                            {processingId === story.id ? 'Removing...' : '🗑️ Remove from Map'}
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))
+            )
+          ) : (
+            // Pins Tab
+            currentPins.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-lg" style={{ color: '#1a1a1a' }}>No pins on the map yet</p>
               </div>
-            ))
+            ) : (
+              currentPins.map((pin) => (
+                <div
+                  key={pin.id}
+                  className="rounded-xl p-6 shadow-lg"
+                  style={{ backgroundColor: '#f3ecf8' }}
+                >
+                  <div className="grid lg:grid-cols-4 gap-6 items-center">
+                    <div className="lg:col-span-3">
+                      <div className="flex items-center gap-4 mb-4">
+                        <h3 className="text-xl font-bold" style={{ color: '#1a1a1a' }}>
+                          📍 {pin.title}
+                        </h3>
+                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                          {pin.category}
+                        </span>
+                      </div>
+                      
+                      <div className="grid md:grid-cols-2 gap-4 text-sm">
+                        <div><strong>Location:</strong> {pin.city ? `${pin.city}, ` : ''}{pin.country}</div>
+                        <div><strong>Coordinates:</strong> {pin.lat.toFixed(4)}, {pin.lng.toFixed(4)}</div>
+                        <div><strong>Type:</strong> {pin.type}</div>
+                        <div><strong>ID:</strong> {pin.id}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => {
+                          if (confirm(`Remove "${pin.title}" from the map?`)) {
+                            // Handle manual pin removal
+                            fetch('/api/admin/remove-from-map', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ storyId: pin.id })
+                            }).then(() => {
+                              fetchCurrentPins()
+                              fetchStories()
+                            })
+                          }
+                        }}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                      >
+                        🗑️ Remove
+                      </button>
+                      <a
+                        href={`https://www.google.com/maps?q=${pin.lat},${pin.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm text-center"
+                      >
+                        🗺️ View
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )
           )}
         </div>
       </div>

@@ -1,38 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleSpreadsheet } from 'google-spreadsheet'
-import { JWT } from 'google-auth-library'
-
-const serviceAccountAuth = new JWT({
-  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-  key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  scopes: ['https://www.googleapis.com/auth/spreadsheets']
-})
+import { sql } from '@vercel/postgres'
 
 export async function POST(request: NextRequest) {
   try {
     const { storyId, status } = await request.json()
 
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID!, serviceAccountAuth)
-    await doc.loadInfo()
+    console.log('🔄 Updating story status:', { storyId, status })
 
-    // Update the story status in Form Submissions sheet
-    const submissionsSheet = doc.sheetsByTitle['Form Submissions']
-    if (!submissionsSheet) {
-      return NextResponse.json({ error: 'Submissions sheet not found' }, { status: 404 })
+    if (!storyId || !status) {
+      return NextResponse.json({ error: 'Missing storyId or status' }, { status: 400 })
     }
 
-    await submissionsSheet.loadHeaderRow()
-    const rows = await submissionsSheet.getRows()
-    
-    // Find the story row by ID (extract index from story_X format)
-    const storyIndex = parseInt(storyId.replace('story_', ''))
-    if (rows[storyIndex]) {
-      rows[storyIndex].set('Status', status)
-      await rows[storyIndex].save()
-      
-      return NextResponse.json({ success: true })
+    if (process.env.NODE_ENV === 'production') {
+      // Production: Update in Vercel Postgres database
+      try {
+        const result = await sql`
+          UPDATE stories 
+          SET status = ${status}, updated_at = NOW() 
+          WHERE id = ${storyId}
+        `
+        
+        console.log(`✅ Updated story ${storyId} status to ${status}`)
+        console.log(`📊 Rows affected: ${result.rowCount}`)
+        
+        if (result.rowCount === 0) {
+          return NextResponse.json({ error: 'Story not found' }, { status: 404 })
+        }
+        
+        return NextResponse.json({ success: true })
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        return NextResponse.json({ error: 'Failed to update status in database' }, { status: 500 })
+      }
     } else {
-      return NextResponse.json({ error: 'Story not found' }, { status: 404 })
+      // Local development: Mock success
+      console.log('Development mode: Status update would be saved to database in production')
+      return NextResponse.json({ success: true })
     }
   } catch (error) {
     console.error('Error updating status:', error)
