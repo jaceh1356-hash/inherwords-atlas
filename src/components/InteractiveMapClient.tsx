@@ -19,17 +19,50 @@ import L from 'leaflet'
  * You can edit these for testing or as backup content.
  */
 
+// Pin interface for TypeScript
+interface MapPin {
+  id?: string
+  lat: number
+  lng: number
+  type: 'story' | 'organization'
+  title: string
+  category: string
+  story?: string
+  country?: string
+  city?: string
+}
+
 // Fallback pins in case API fails
-const fallbackPins = [
-  { lat: 40.7128, lng: -74.0060, type: 'story', title: 'Healthcare Access in NYC', category: 'healthcare' },
-  { lat: 34.0522, lng: -118.2437, type: 'organization', title: 'Women\'s Health Center LA', category: 'support' },
-  { lat: 51.5074, lng: -0.1278, type: 'story', title: 'Workplace Equality Story', category: 'workplace' }
+const fallbackPins: MapPin[] = [
+  { 
+    lat: 40.7128, 
+    lng: -74.0060, 
+    type: 'story', 
+    title: 'Healthcare Access in NYC', 
+    category: 'healthcare',
+    story: 'A personal story about healthcare access challenges in urban areas.'
+  },
+  { 
+    lat: 34.0522, 
+    lng: -118.2437, 
+    type: 'organization', 
+    title: 'Women\'s Health Center LA', 
+    category: 'support' 
+  },
+  { 
+    lat: 51.5074, 
+    lng: -0.1278, 
+    type: 'story', 
+    title: 'Workplace Equality Story', 
+    category: 'workplace',
+    story: 'An inspiring story about fighting for workplace equality and fair treatment.'
+  }
 ]
 
 export default function InteractiveMapClient() {
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<L.Map | null>(null)
-  const [storyPins, setStoryPins] = useState(fallbackPins)
+  const [storyPins, setStoryPins] = useState<MapPin[]>(fallbackPins)
 
   // Fetch pins from Google Sheets
   useEffect(() => {
@@ -287,7 +320,7 @@ export default function InteractiveMapClient() {
       marker.bindPopup(`
         <div class="custom-popup">
           <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
-          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? 'Personal Story' : 'Support Organization'}</p>
+          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? (pin.story ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Personal Story') : 'Support Organization'}</p>
           <span class="inline-block px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">${pin.category}</span>
         </div>
       `)

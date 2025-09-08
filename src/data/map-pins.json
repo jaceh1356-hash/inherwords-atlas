@@ -2,6 +2,7 @@
   {
     "id": "sample_1",
     "title": "Healthcare Access Story",
+    "story": "Living in an underserved community, I witnessed how difficult it was for women to access basic healthcare services. The nearest clinic was hours away, and many couldn't afford the travel costs. I started organizing carpools and advocating for mobile health services in our area.",
     "lat": 40.7128,
     "lng": -74.006,
     "type": "story",
@@ -12,6 +13,7 @@
   {
     "id": "sample_2",
     "title": "Workplace Rights Campaign",
+    "story": "When I discovered the gender pay gap in my company, I decided to take action. It wasn't easy to speak up, knowing it could impact my career. But I documented everything and worked with HR to implement fair compensation policies that benefited all employees.",
     "lat": 51.5074,
     "lng": -0.1278,
     "type": "story",
@@ -22,6 +24,7 @@
   {
     "id": "sample_3",
     "title": "Education Equality Initiative",
+    "story": "Growing up in a rural area, quality education seemed like a distant dream. Despite the challenges, I pursued my studies with determination. Now I'm working to establish scholarship programs and educational resources for girls in similar situations.",
     "lat": 48.8566,
     "lng": 2.3522,
     "type": "story",
@@ -32,6 +35,7 @@
   {
     "id": "story_3",
     "title": "Test",
+    "story": "This is a test story to verify that our platform works correctly. It represents the voices of women who want to share their experiences and make a difference in their communities.",
     "lat": 19.054999,
     "lng": 72.8692035,
     "type": "story",
@@ -42,6 +46,7 @@
   {
     "id": "test_123",
     "title": "Test Story",
+    "story": "Another test entry to ensure our mapping system properly displays user-submitted stories. Each pin represents a real person's experience and journey toward equality.",
     "lat": 40.7127281,
     "lng": -74.0060152,
     "type": "story",
@@ -52,6 +57,7 @@
   {
     "id": "test_api_123",
     "title": "API Test Story",
+    "story": "This story was added through our API system to test the submission and display process. It demonstrates how users can share their experiences through our platform.",
     "lat": 48.8534951,
     "lng": 2.3483915,
     "type": "story",
@@ -62,6 +68,7 @@
   {
     "id": "story_4",
     "title": "Melissa Test",
+    "story": "As a software engineer in Silicon Valley, I've experienced both the challenges and opportunities in the tech industry. I'm passionate about mentoring other women entering STEM fields and creating inclusive work environments where everyone can thrive.",
     "lat": 37.3361663,
     "lng": -121.890591,
     "type": "story",
