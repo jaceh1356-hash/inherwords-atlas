@@ -15,9 +15,20 @@ interface Story {
   submittedAt: string
 }
 
+interface MapPin {
+  id: string
+  title: string
+  country: string
+  city: string
+  lat: number
+  lng: number
+  category: string
+  type: string
+}
+
 export default function AdminPage() {
   const [stories, setStories] = useState<Story[]>([])
-  const [currentPins, setCurrentPins] = useState<any[]>([])
+  const [currentPins, setCurrentPins] = useState<MapPin[]>([])
   const [activeTab, setActiveTab] = useState<'stories' | 'pins'>('stories')
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<string | null>(null)
