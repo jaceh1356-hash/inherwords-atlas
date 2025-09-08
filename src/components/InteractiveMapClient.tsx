@@ -69,12 +69,12 @@ export default function InteractiveMapClient() {
     const fetchPins = async () => {
       console.log('🔍 Fetching pins from API...')
       try {
-        const response = await fetch('/api/map-pins')
+        const response = await fetch(`/api/map-pins?t=${Date.now()}`)
         console.log('📡 API Response status:', response.status)
         const data = await response.json()
         console.log('📊 API returned data:', data)
         if (data.pins && data.pins.length > 0) {
-          console.log('✅ Setting pins:', data.pins)
+          console.log('✅ Setting pins:', data.pins.length, 'pins loaded')
           setStoryPins(data.pins)
         } else {
           console.log('⚠️ No pins returned, using fallback')
@@ -312,7 +312,7 @@ export default function InteractiveMapClient() {
 
     // Add all pins to the map
     storyPins.forEach(pin => {
-      console.log('📍 Adding pin:', pin.title, 'at', pin.lat, pin.lng)
+      console.log('📍 Adding pin:', pin.title)
       const marker = L.marker([pin.lat, pin.lng], { icon: pushpinIcon })
         .addTo(leafletMap.current!)
 
@@ -320,7 +320,7 @@ export default function InteractiveMapClient() {
       marker.bindPopup(`
         <div class="custom-popup">
           <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
-          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? (pin.story ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Personal Story') : 'Support Organization'}</p>
+          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? (pin.story ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Your Story *') : 'Support Organization'}</p>
           <span class="inline-block px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">${pin.category}</span>
         </div>
       `)
