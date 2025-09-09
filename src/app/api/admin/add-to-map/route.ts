@@ -63,9 +63,9 @@ async function getCoordinates(city: string, country: string): Promise<{ lat: num
 
 export async function POST(request: NextRequest) {
   try {
-    const { storyId, title, country, city, category } = await request.json()
+    const { storyId, title, story, country, city, category } = await request.json()
 
-    console.log('🔄 Adding to map:', { storyId, title, country, city, category })
+    console.log('🔄 Adding to map:', { storyId, title, story: story ? 'provided' : 'missing', country, city, category })
 
     // Validate required fields
     if (!storyId || !title || !country) {
@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
     const newPin = {
       id: storyId,
       title: title,
+      story: story || '',
       lat: coordinates.lat,
       lng: coordinates.lng,
       type: 'story',

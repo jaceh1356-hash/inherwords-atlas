@@ -213,6 +213,7 @@ export default function AdminPage() {
         body: JSON.stringify({
           storyId: story.id,
           title: story.title,
+          story: story.story,
           country: story.country,
           city: story.city,
           category: 'story'
