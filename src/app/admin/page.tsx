@@ -284,7 +284,7 @@ export default function AdminPage() {
                 : 'text-gray-700 hover:text-gray-900'
             }`}
           >
-            📝 Stories ({stories.length})
+            📝 New Stories ({stories.length})
           </button>
           <button
             onClick={() => setActiveTab('pins')}
