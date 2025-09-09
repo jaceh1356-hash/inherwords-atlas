@@ -11,7 +11,7 @@ export async function GET() {
       
       try {
         const result = await sql`
-          SELECT id, title, lat, lng, type, category, country, city, created_at
+          SELECT id, title, story, lat, lng, type, category, country, city, created_at
           FROM map_pins
           ORDER BY created_at DESC
         `
@@ -19,6 +19,7 @@ export async function GET() {
         const pins = result.rows.map(row => ({
           id: row.id,
           title: row.title,
+          story: row.story || '',
           lat: Number(row.lat),
           lng: Number(row.lng),
           type: row.type,
@@ -50,9 +51,9 @@ export async function GET() {
   
   // Return fallback pins if everything else fails
   const fallbackPins = [
-    { title: 'NYC Healthcare Story', lat: 40.7128, lng: -74.0060, type: 'story', category: 'healthcare' },
-    { title: 'LA Support Center', lat: 34.0522, lng: -118.2437, type: 'story', category: 'support' },
-    { title: 'London Workplace Rights', lat: 51.5074, lng: -0.1278, type: 'story', category: 'workplace' }
+    { title: 'NYC Healthcare Story', story: 'A healthcare access story from New York City', lat: 40.7128, lng: -74.0060, type: 'story', category: 'healthcare' },
+    { title: 'LA Support Center', story: 'Supporting women in Los Angeles', lat: 34.0522, lng: -118.2437, type: 'story', category: 'support' },
+    { title: 'London Workplace Rights', story: 'Fighting for workplace equality in London', lat: 51.5074, lng: -0.1278, type: 'story', category: 'workplace' }
   ]
   
   console.log('Using fallback pins due to error')
