@@ -11,7 +11,7 @@ export async function GET() {
       
       try {
         const result = await sql`
-          SELECT id, title, story, lat, lng, type, category, country, city, created_at
+          SELECT id, title, lat, lng, type, category, country, city, created_at
           FROM map_pins
           ORDER BY created_at DESC
         `
@@ -19,7 +19,6 @@ export async function GET() {
         const pins = result.rows.map(row => ({
           id: row.id,
           title: row.title,
-          story: row.story || '',
           lat: Number(row.lat),
           lng: Number(row.lng),
           type: row.type,
