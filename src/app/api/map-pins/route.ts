@@ -42,6 +42,7 @@ export async function GET() {
         }))
         
         console.log(`Returning ${pins.length} pins from database`)
+        console.log('Sample pin with story info:', pins[0] ? { id: pins[0].id, title: pins[0].title, story: pins[0].story ? 'HAS STORY' : 'NO STORY', storyLength: pins[0].story?.length || 0 } : 'No pins')
         return NextResponse.json({ pins })
       } catch (dbError) {
         console.error('Database error, using fallback pins:', dbError)

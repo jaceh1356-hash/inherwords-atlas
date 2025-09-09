@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
   try {
     const { storyId, title, story, country, city, category } = await request.json()
 
-    console.log('🔄 Adding to map:', { storyId, title, story: story ? 'provided' : 'missing', country, city, category })
+    console.log('🔄 Adding to map:', { storyId, title, story: story ? `"${story.substring(0, 50)}..."` : 'MISSING', country, city, category })
 
     // Validate required fields
     if (!storyId || !title || !country) {
@@ -129,6 +129,7 @@ export async function POST(request: NextRequest) {
         }
         
         console.log(`✅ Added pin to database for ${title} at ${coordinates.lat}, ${coordinates.lng}`)
+        console.log(`📝 Story content saved: ${story ? `"${story.substring(0, 50)}..."` : 'NO STORY'}`)
         return NextResponse.json({ success: true, coordinates, pin: newPin })
       } catch (dbError) {
         console.error('❌ Database error:', dbError)
