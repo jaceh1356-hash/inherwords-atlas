@@ -75,6 +75,13 @@ export default function InteractiveMapClient() {
         console.log('📊 API returned data:', data)
         if (data.pins && data.pins.length > 0) {
           console.log('✅ Setting pins:', data.pins.length, 'pins loaded')
+          console.log('🔍 First pin story check:', data.pins[0] ? { 
+            id: data.pins[0].id, 
+            title: data.pins[0].title, 
+            hasStory: !!data.pins[0].story,
+            storyContent: data.pins[0].story ? data.pins[0].story.substring(0, 50) + '...' : 'NO STORY',
+            storyLength: data.pins[0].story?.length || 0
+          } : 'No pins')
           setStoryPins(data.pins)
         } else {
           console.log('⚠️ No pins returned, using fallback')
