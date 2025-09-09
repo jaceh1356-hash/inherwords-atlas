@@ -99,17 +99,34 @@ export async function POST(request: NextRequest) {
     if (process.env.NODE_ENV === 'production') {
       // Production: Use Vercel Postgres database
       try {
-        await sql`
-          INSERT INTO map_pins (id, title, lat, lng, type, category, country, city)
-          VALUES (${storyId}, ${title}, ${coordinates.lat}, ${coordinates.lng}, 'story', ${category || 'general'}, ${country}, ${city || ''})
-          ON CONFLICT (id) DO UPDATE SET 
-            title = EXCLUDED.title,
-            lat = EXCLUDED.lat,
-            lng = EXCLUDED.lng,
-            category = EXCLUDED.category,
-            country = EXCLUDED.country,
-            city = EXCLUDED.city
-        `
+        // Try to insert with story field, fallback if column doesn't exist
+        try {
+          await sql`
+            INSERT INTO map_pins (id, title, story, lat, lng, type, category, country, city)
+            VALUES (${storyId}, ${title}, ${story || ''}, ${coordinates.lat}, ${coordinates.lng}, 'story', ${category || 'general'}, ${country}, ${city || ''})
+            ON CONFLICT (id) DO UPDATE SET 
+              title = EXCLUDED.title,
+              story = EXCLUDED.story,
+              lat = EXCLUDED.lat,
+              lng = EXCLUDED.lng,
+              category = EXCLUDED.category,
+              country = EXCLUDED.country,
+              city = EXCLUDED.city
+          `
+        } catch (columnError) {
+          console.log('Story column does not exist, using basic insert')
+          await sql`
+            INSERT INTO map_pins (id, title, lat, lng, type, category, country, city)
+            VALUES (${storyId}, ${title}, ${coordinates.lat}, ${coordinates.lng}, 'story', ${category || 'general'}, ${country}, ${city || ''})
+            ON CONFLICT (id) DO UPDATE SET 
+              title = EXCLUDED.title,
+              lat = EXCLUDED.lat,
+              lng = EXCLUDED.lng,
+              category = EXCLUDED.category,
+              country = EXCLUDED.country,
+              city = EXCLUDED.city
+          `
+        }
         
         console.log(`✅ Added pin to database for ${title} at ${coordinates.lat}, ${coordinates.lng}`)
         return NextResponse.json({ success: true, coordinates, pin: newPin })

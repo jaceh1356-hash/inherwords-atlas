@@ -10,15 +10,27 @@ export async function GET() {
       console.log('Loading map pins from database...')
       
       try {
-        const result = await sql`
-          SELECT id, title, lat, lng, type, category, country, city, created_at
-          FROM map_pins
-          ORDER BY created_at DESC
-        `
+        // Try to get story field, fallback if column doesn't exist
+        let result
+        try {
+          result = await sql`
+            SELECT id, title, story, lat, lng, type, category, country, city, created_at
+            FROM map_pins
+            ORDER BY created_at DESC
+          `
+        } catch (columnError) {
+          console.log('Story column does not exist, using basic query')
+          result = await sql`
+            SELECT id, title, lat, lng, type, category, country, city, created_at
+            FROM map_pins
+            ORDER BY created_at DESC
+          `
+        }
         
         const pins = result.rows.map(row => ({
           id: row.id,
           title: row.title,
+          story: row.story || '',
           lat: Number(row.lat),
           lng: Number(row.lng),
           type: row.type,
@@ -42,6 +54,7 @@ export async function GET() {
       const pins = JSON.parse(fileContents)
       
       console.log(`Returning ${pins.length} pins from local storage`)
+      console.log('First pin with story:', pins[0])
       return NextResponse.json({ pins })
     }
   } catch (error) {
