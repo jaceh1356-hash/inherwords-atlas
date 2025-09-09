@@ -320,6 +320,13 @@ export default function InteractiveMapClient() {
     // Add all pins to the map
     storyPins.forEach(pin => {
       console.log('📍 Adding pin:', pin.title)
+      console.log('📖 Pin story debug:', { 
+        title: pin.title, 
+        hasStory: !!pin.story, 
+        storyContent: pin.story ? pin.story.substring(0, 50) + '...' : 'NO STORY',
+        storyLength: pin.story?.length || 0,
+        type: pin.type
+      })
       const marker = L.marker([pin.lat, pin.lng], { icon: pushpinIcon })
         .addTo(leafletMap.current!)
 
