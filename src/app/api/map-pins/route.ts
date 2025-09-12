@@ -7,7 +7,7 @@ export async function GET() {
   try {
     if (process.env.NODE_ENV === 'production') {
       // Production: Read from Vercel Postgres database
-      console.log('Loading map pins from database...')
+      console.log('Loading map pins from database... (restart trigger)')
       
       try {
         // Try to get story field, fallback if column doesn't exist
