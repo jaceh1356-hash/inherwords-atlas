@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
               VALUES (
                 ${submissionId},
                 ${formData.organizationName},
-                ${formData.organizationDescription + (formData.website ? '\nWebsite: ' + formData.website : '') + (formData.focusAreas?.length ? '\nFocus Areas: ' + formData.focusAreas.join(', ') : '')},
+                ${'Organization: ' + formData.organizationDescription + (formData.website ? '\nWebsite: ' + formData.website : '') + (formData.focusAreas?.length ? '\nFocus Areas: ' + formData.focusAreas.join(', ') : '')},
                 ${formData.country},
                 ${formData.city || ''},
                 ${formData.email || ''},
