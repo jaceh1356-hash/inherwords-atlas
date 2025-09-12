@@ -43,10 +43,9 @@ export async function POST(request: NextRequest) {
       try {
         if (formData.type === 'personal') {
           await sql`
-            INSERT INTO stories (id, type, title, story, country, city, email, anonymous, status, submitted_at)
+            INSERT INTO stories (id, title, story, country, city, email, anonymous, status, submitted_at)
             VALUES (
               ${submissionId},
-              ${formData.type},
               ${formData.title},
               ${formData.story},
               ${formData.country},
@@ -58,22 +57,49 @@ export async function POST(request: NextRequest) {
             )
           `
         } else {
-          await sql`
-            INSERT INTO stories (id, type, organization_name, organization_description, website, focus_areas, country, city, email, status, submitted_at)
-            VALUES (
-              ${submissionId},
-              ${formData.type},
-              ${formData.organizationName},
-              ${formData.organizationDescription},
-              ${formData.website || ''},
-              ${formData.focusAreas || []},
-              ${formData.country},
-              ${formData.city || ''},
-              ${formData.email || ''},
-              'pending',
-              NOW()
-            )
-          `
+          // For organizations, try to use existing columns and add missing ones if needed
+          try {
+            // First, try to add missing columns if they don't exist
+            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'personal'`
+            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS organization_name VARCHAR(255)`
+            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS organization_description TEXT`
+            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS website VARCHAR(500)`
+            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS focus_areas TEXT[]`
+            
+            await sql`
+              INSERT INTO stories (id, type, organization_name, organization_description, website, focus_areas, country, city, email, status, submitted_at)
+              VALUES (
+                ${submissionId},
+                ${formData.type},
+                ${formData.organizationName},
+                ${formData.organizationDescription},
+                ${formData.website || ''},
+                ${formData.focusAreas || []},
+                ${formData.country},
+                ${formData.city || ''},
+                ${formData.email || ''},
+                'pending',
+                NOW()
+              )
+            `
+          } catch (orgError) {
+            console.log('Organization columns missing, storing as regular story format')
+            // Fallback: store organization data in existing columns
+            await sql`
+              INSERT INTO stories (id, title, story, country, city, email, anonymous, status, submitted_at)
+              VALUES (
+                ${submissionId},
+                ${formData.organizationName},
+                ${'Organization: ' + formData.organizationDescription + (formData.website ? '\nWebsite: ' + formData.website : '') + (formData.focusAreas?.length ? '\nFocus Areas: ' + formData.focusAreas.join(', ') : '')},
+                ${formData.country},
+                ${formData.city || ''},
+                ${formData.email || ''},
+                false,
+                'pending',
+                NOW()
+              )
+            `
+          }
         }
         
         console.log(`✅ ${formData.type === 'organization' ? 'Organization' : 'Story'} submitted to database: ${submissionId}`)

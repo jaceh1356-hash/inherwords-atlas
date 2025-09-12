@@ -8,24 +8,64 @@ export async function GET() {
       console.log('Loading stories from database...')
       
       try {
-        const result = await sql`
-          SELECT id, title, story, country, city, email, anonymous, status, submitted_at, updated_at
-          FROM stories
-          ORDER BY submitted_at DESC
-        `
+        // Try to get organization columns first, fall back to basic columns
+        let result
+        try {
+          result = await sql`
+            SELECT 
+              id, 
+              type,
+              title, 
+              story, 
+              organization_name,
+              organization_description,
+              website,
+              focus_areas,
+              country, 
+              city, 
+              email, 
+              anonymous, 
+              status, 
+              submitted_at, 
+              updated_at
+            FROM stories
+            ORDER BY submitted_at DESC
+          `
+        } catch (columnError) {
+          console.log('Organization columns not found, using basic query')
+          result = await sql`
+            SELECT id, title, story, country, city, email, anonymous, status, submitted_at, updated_at
+            FROM stories
+            ORDER BY submitted_at DESC
+          `
+        }
         
-        const stories = result.rows.map(row => ({
-          id: row.id,
-          title: row.title,
-          story: row.story,
-          country: row.country,
-          city: row.city || '',
-          email: row.email || '',
-          anonymous: Boolean(row.anonymous),
-          status: row.status,
-          submittedAt: row.submitted_at,
-          updatedAt: row.updated_at
-        }))
+        const stories = result.rows.map(row => {
+          // Check if this is an organization based on data format
+          const isOrganization = row.id?.startsWith('organization_') || 
+                                (row.story && row.story.startsWith('Organization:')) ||
+                                row.type === 'organization'
+          
+          return {
+            id: row.id,
+            type: row.type || (isOrganization ? 'organization' : 'personal'),
+            title: row.title,
+            story: row.story,
+            organizationName: row.organization_name || (isOrganization ? row.title : undefined),
+            organizationDescription: row.organization_description || 
+              (isOrganization && row.story?.startsWith('Organization:') ? 
+                row.story.split('\n')[0].replace('Organization: ', '') : undefined),
+            website: row.website,
+            focusAreas: row.focus_areas || [],
+            country: row.country,
+            city: row.city || '',
+            email: row.email || '',
+            anonymous: Boolean(row.anonymous),
+            status: row.status,
+            submittedAt: row.submitted_at,
+            updatedAt: row.updated_at
+          }
+        })
         
         console.log(`Returning ${stories.length} stories from database`)
         return NextResponse.json({ stories })
