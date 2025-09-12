@@ -93,6 +93,7 @@ export default function SubmitPage() {
 function SimpleShareStoryForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
+  const [formType, setFormType] = useState<'personal' | 'organization'>('personal')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -105,13 +106,19 @@ function SimpleShareStoryForm() {
     try {
       const formData = new FormData(form)
       const data = {
+        type: formType,
         title: formData.get('title'),
         story: formData.get('story'),
         email: formData.get('email'),
         country: formData.get('country'),
         city: formData.get('city'),
         anonymous: formData.has('anonymous'),
-        agreedToTerms: formData.has('agreedToTerms')
+        agreedToTerms: formData.has('agreedToTerms'),
+        // Organization fields
+        organizationName: formData.get('organizationName'),
+        organizationDescription: formData.get('organizationDescription'),
+        website: formData.get('website'),
+        focusAreas: formData.get('focusAreas') ? (formData.get('focusAreas') as string).split(',').map(area => area.trim()).filter(Boolean) : []
       }
 
       const response = await fetch('/api/submit-story', {
@@ -161,11 +168,45 @@ function SimpleShareStoryForm() {
       <div className="max-w-4xl mx-auto">
         <div className="rounded-3xl p-6 md:p-8" style={{ backgroundColor: '#f3ecf8' }}>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Story Title */}
+            {/* Form Type Selector */}
             <div className="mb-6">
-              <label htmlFor="title" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
-                Story Title *
+              <label className="block text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+                What would you like to share? *
               </label>
+              <div className="flex space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="formType"
+                    value="personal"
+                    checked={formType === 'personal'}
+                    onChange={(e) => setFormType(e.target.value as 'personal' | 'organization')}
+                    className="mr-2"
+                  />
+                  <span className="text-sm" style={{ color: '#1a1a1a' }}>Personal Story</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="formType"
+                    value="organization"
+                    checked={formType === 'organization'}
+                    onChange={(e) => setFormType(e.target.value as 'personal' | 'organization')}
+                    className="mr-2"
+                  />
+                  <span className="text-sm" style={{ color: '#1a1a1a' }}>Organization</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Conditional Fields Based on Type */}
+            {formType === 'personal' ? (
+              <>
+                {/* Story Title */}
+                <div className="mb-6">
+                  <label htmlFor="title" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                    Story Title *
+                  </label>
               <input
                 type="text"
                 id="title"
@@ -242,6 +283,124 @@ function SimpleShareStoryForm() {
                 />
               </div>
             </div>
+              </>
+            ) : (
+              <>
+                {/* Organization Name */}
+                <div className="mb-6">
+                  <label htmlFor="organizationName" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                    Organization Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="organizationName"
+                    name="organizationName"
+                    required
+                    placeholder="Name of your organization"
+                    className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-900 text-lg" 
+                    style={{ backgroundColor: '#f8f9fa' }}
+                  />
+                </div>
+
+                {/* Organization Description */}
+                <div className="mb-6">
+                  <label htmlFor="organizationDescription" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                    Organization Description *
+                  </label>
+                  <textarea
+                    id="organizationDescription"
+                    name="organizationDescription"
+                    rows={8}
+                    required
+                    placeholder="Describe your organization's mission, activities, and impact on gender equality or women's rights."
+                    className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-900 text-lg resize-vertical min-h-[200px]"
+                    style={{ backgroundColor: '#f8f9fa' }}
+                  />
+                </div>
+
+                {/* Website */}
+                <div className="mb-6">
+                  <label htmlFor="website" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                    Website (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    id="website"
+                    name="website"
+                    placeholder="https://yourorganization.com"
+                    className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-900 text-lg"
+                    style={{ backgroundColor: '#f8f9fa' }}
+                  />
+                </div>
+
+                {/* Focus Areas */}
+                <div className="mb-6">
+                  <label htmlFor="focusAreas" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                    Focus Areas (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="focusAreas"
+                    name="focusAreas"
+                    placeholder="e.g., Healthcare, Education, Workplace Rights (separate with commas)"
+                    className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-900 text-lg"
+                    style={{ backgroundColor: '#f8f9fa' }}
+                  />
+                </div>
+
+                {/* Email for Confirmation */}
+                <div className="mb-6">
+                  <label htmlFor="email" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                    Contact Email *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    placeholder="your@email.com"
+                    className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-900 text-lg"
+                    style={{ backgroundColor: '#f8f9fa' }}
+                  />
+                  <p className="text-xs mt-2" style={{ color: '#666' }}>
+                    Required for verification and follow-up questions.
+                  </p>
+                </div>
+
+                {/* Location */}
+                <div className="mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="country" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                        Country *
+                      </label>
+                      <input
+                        type="text"
+                        id="country"
+                        name="country"
+                        required
+                        placeholder="e.g., United States"
+                        className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-900 text-lg"
+                        style={{ backgroundColor: '#f8f9fa' }}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="city" className="block text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+                        City/Region
+                      </label>
+                      <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        placeholder="e.g., New York"
+                        className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-900 text-lg"
+                        style={{ backgroundColor: '#f8f9fa' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Privacy Options */}
             <div className="mb-8">
@@ -300,7 +459,7 @@ function SimpleShareStoryForm() {
                   backgroundColor: isSubmitting ? undefined : '#0f7c7c'
                 }}
               >
-                {isSubmitting ? 'Submitting...' : 'Share My Story'}
+                {isSubmitting ? 'Submitting...' : formType === 'organization' ? 'Submit Organization' : 'Share My Story'}
               </button>
               
               {submitMessage && (
