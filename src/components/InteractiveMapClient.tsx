@@ -309,13 +309,16 @@ export default function InteractiveMapClient() {
       }
     })
 
-    // Create custom pushpin icon
-    const pushpinIcon = L.divIcon({
-      className: 'custom-marker',
-      html: '<div class="pushpin-container"><div class="pushpin-head"></div><div class="pushpin-needle"></div></div>',
-      iconSize: [26, 38],
-      iconAnchor: [13, 38]
-    })
+    // Create custom pushpin icon function
+    const createPushpinIcon = (type: 'story' | 'organization') => {
+      const color = type === 'organization' ? '#1e3a8a' : '#dc2626' // Dark blue for organizations, red for stories
+      return L.divIcon({
+        className: 'custom-marker',
+        html: `<div class="pushpin-container"><div class="pushpin-head" style="background-color: ${color}"></div><div class="pushpin-needle" style="background-color: ${color}"></div></div>`,
+        iconSize: [26, 38],
+        iconAnchor: [13, 38]
+      })
+    }
 
     // Add all pins to the map
     storyPins.forEach(pin => {
@@ -327,15 +330,15 @@ export default function InteractiveMapClient() {
         storyLength: pin.story?.length || 0,
         type: pin.type
       })
-      const marker = L.marker([pin.lat, pin.lng], { icon: pushpinIcon })
+      const marker = L.marker([pin.lat, pin.lng], { icon: createPushpinIcon(pin.type) })
         .addTo(leafletMap.current!)
 
       // Add popup with story/organization info
       marker.bindPopup(`
         <div class="custom-popup">
           <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
-          <p class="text-xs text-slate-600 mb-2">${pin.type === 'story' ? (pin.story ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Your Story *') : 'Support Organization'}</p>
-          <span class="inline-block px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">${pin.category}</span>
+          <p class="text-xs text-slate-600 mb-2">${pin.type === 'organization' ? (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Organization information not available') : (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Story content not available')}</p>
+          <span class="inline-block px-2 py-1 ${pin.type === 'organization' ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'} text-xs rounded-full">${pin.category}</span>
         </div>
       `)
     })
@@ -343,7 +346,24 @@ export default function InteractiveMapClient() {
 
   return (
     <>
-      <div ref={mapRef} className="w-full h-96 md:h-[500px] rounded-lg overflow-hidden" />
+      <div className="relative">
+        <div ref={mapRef} className="w-full h-96 md:h-[500px] rounded-lg overflow-hidden" />
+        
+        {/* Pin Legend */}
+        <div className="absolute top-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200">
+          <h4 className="font-semibold text-sm mb-2">Pin Legend</h4>
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 rounded-full bg-red-600"></div>
+              <span className="text-xs">Personal Stories</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 rounded-full bg-blue-800"></div>
+              <span className="text-xs">Organizations</span>
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Gender Inequality Index Legend */}
       <div className="mt-6 bg-white p-4 rounded-lg shadow-sm border">
