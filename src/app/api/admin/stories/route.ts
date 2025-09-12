@@ -42,9 +42,7 @@ export async function GET() {
         
         const stories = result.rows.map(row => {
           // Check if this is an organization based on data format
-          const isOrganization = row.id?.startsWith('organization_') || 
-                                (row.story && row.story.startsWith('Organization:')) ||
-                                row.type === 'organization'
+          const isOrganization = row.id?.startsWith('organization_') || row.type === 'organization'
           
           return {
             id: row.id,
@@ -53,10 +51,13 @@ export async function GET() {
             story: row.story,
             organizationName: row.organization_name || (isOrganization ? row.title : undefined),
             organizationDescription: row.organization_description || 
-              (isOrganization && row.story?.startsWith('Organization:') ? 
-                row.story.split('\n')[0].replace('Organization: ', '') : undefined),
-            website: row.website,
-            focusAreas: row.focus_areas || [],
+              (isOrganization ? row.story?.split('\nWebsite:')[0] : undefined),
+            website: row.website || 
+              (isOrganization && row.story?.includes('\nWebsite:') ? 
+                row.story.split('\nWebsite:')[1]?.split('\n')[0]?.trim() : undefined),
+            focusAreas: row.focus_areas || 
+              (isOrganization && row.story?.includes('\nFocus Areas:') ? 
+                row.story.split('\nFocus Areas:')[1]?.trim().split(', ') : []),
             country: row.country,
             city: row.city || '',
             email: row.email || '',

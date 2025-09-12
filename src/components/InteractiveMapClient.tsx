@@ -337,7 +337,7 @@ export default function InteractiveMapClient() {
       marker.bindPopup(`
         <div class="custom-popup">
           <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
-          <p class="text-xs text-slate-600 mb-2">${pin.type === 'organization' ? (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Organization information not available') : (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Story content not available')}</p>
+          <p class="text-xs text-slate-600 mb-2">${pin.type === 'organization' ? (pin.story && pin.story.trim() ? pin.story.replace(/^Organization:\s*/, '').substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Organization information not available') : (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Story content not available')}</p>
           <span class="inline-block px-2 py-1 ${pin.type === 'organization' ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'} text-xs rounded-full">${pin.category}</span>
         </div>
       `)
@@ -346,24 +346,7 @@ export default function InteractiveMapClient() {
 
   return (
     <>
-      <div className="relative">
-        <div ref={mapRef} className="w-full h-96 md:h-[500px] rounded-lg overflow-hidden" />
-        
-        {/* Pin Legend */}
-        <div className="absolute top-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200">
-          <h4 className="font-semibold text-sm mb-2">Pin Legend</h4>
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded-full bg-red-600"></div>
-              <span className="text-xs">Personal Stories</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded-full bg-blue-800"></div>
-              <span className="text-xs">Organizations</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div ref={mapRef} className="w-full h-96 md:h-[500px] rounded-lg overflow-hidden" />
       
       {/* Gender Inequality Index Legend */}
       <div className="mt-6 bg-white p-4 rounded-lg shadow-sm border">
@@ -374,7 +357,22 @@ export default function InteractiveMapClient() {
           <h3 className="font-semibold text-gray-800">Map Legend</h3>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Pin Color Legend */}
+          <div>
+            <h4 className="font-medium text-sm text-gray-700 mb-3">Pin Types</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-red-600"></div>
+                <span className="text-sm text-gray-600">Personal Stories</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-blue-800"></div>
+                <span className="text-sm text-gray-600">Organizations</span>
+              </div>
+            </div>
+          </div>
+          
           {/* Legend Color Scale */}
           <div>
             <h4 className="font-medium text-sm text-gray-700 mb-3">Gender Inequality Index</h4>
