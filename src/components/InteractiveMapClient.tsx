@@ -393,7 +393,7 @@ export default function InteractiveMapClient() {
         <div class="custom-popup">
           <h4 class="font-bold text-sm mb-1">${displayTitle}</h4>
           <p class="text-xs text-slate-600 mb-2">${isOrgPin ? (displayStory && displayStory.trim() ? displayStory.substring(0, 150) + (displayStory.length > 150 ? '...' : '') : 'Organization information not available') : (displayStory && displayStory.trim() ? displayStory.substring(0, 150) + (displayStory.length > 150 ? '...' : '') : 'Story content not available')}</p>
-          <span class="inline-block px-2 py-1 ${isOrgPin ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'} text-xs rounded-full">${pin.category}</span>
+          <span class="inline-block px-2 py-1 ${isOrgPin ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'} text-xs rounded-full">${isOrgPin ? 'Organization' : 'Story'}</span>
         </div>
       `)
     })
@@ -419,7 +419,7 @@ export default function InteractiveMapClient() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-red-600"></div>
-                <span className="text-sm text-gray-600">Personal Stories</span>
+                <span className="text-sm text-gray-600">Stories</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-blue-800"></div>
