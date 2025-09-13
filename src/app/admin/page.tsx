@@ -115,7 +115,7 @@ export default function AdminPage() {
           country: story.country,
           city: story.city,
           category: story.type === 'organization' ? 'organization' : 'story',
-          type: story.type || 'personal'
+          type: story.type === 'organization' ? 'organization' : 'story'
         })
       })
 
@@ -224,7 +224,7 @@ export default function AdminPage() {
           country: story.country,
           city: story.city,
           category: story.type === 'organization' ? 'organization' : 'story',
-          type: story.type || 'personal'
+          type: story.type === 'organization' ? 'organization' : 'story'
         })
       })
 

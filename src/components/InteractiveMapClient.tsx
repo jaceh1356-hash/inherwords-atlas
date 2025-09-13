@@ -328,7 +328,9 @@ export default function InteractiveMapClient() {
         hasStory: !!pin.story, 
         storyContent: pin.story ? pin.story.substring(0, 50) + '...' : 'NO STORY',
         storyLength: pin.story?.length || 0,
-        type: pin.type
+        type: pin.type,
+        pinType: `"${pin.type}"`,
+        isOrganization: pin.type === 'organization'
       })
       const marker = L.marker([pin.lat, pin.lng], { icon: createPushpinIcon(pin.type) })
         .addTo(leafletMap.current!)
