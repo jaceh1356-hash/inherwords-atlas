@@ -105,18 +105,26 @@ export default function AdminPage() {
   const addToMap = async (story: Story) => {
     setProcessingId(story.id)
     try {
+      const requestData = {
+        storyId: story.id,
+        title: story.title,
+        story: story.type === 'organization' ? story.organizationDescription : story.story,
+        country: story.country,
+        city: story.city,
+        category: story.type === 'organization' ? 'organization' : 'story',
+        type: story.type === 'organization' ? 'organization' : 'story'
+      }
+      
+      console.log('🚀 ADMIN DEBUG - Sending to add-to-map:', {
+        storyType: story.type,
+        isOrganization: story.type === 'organization',
+        requestData
+      })
+      
       const response = await fetch('/api/admin/add-to-map', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          storyId: story.id,
-          title: story.title,
-          story: story.type === 'organization' ? story.organizationDescription : story.story,
-          country: story.country,
-          city: story.city,
-          category: story.type === 'organization' ? 'organization' : 'story',
-          type: story.type === 'organization' ? 'organization' : 'story'
-        })
+        body: JSON.stringify(requestData)
       })
 
       if (response.ok) {
@@ -211,21 +219,29 @@ export default function AdminPage() {
       }
 
       // Then add to map
+      const mapRequestData = {
+        storyId: story.id,
+        title: story.title,
+        story: story.type === 'organization' ? story.organizationDescription : story.story,
+        country: story.country,
+        city: story.city,
+        category: story.type === 'organization' ? 'organization' : 'story',
+        type: story.type === 'organization' ? 'organization' : 'story'
+      }
+      
+      console.log('🚀 ADMIN APPROVE DEBUG - Sending to add-to-map:', {
+        storyType: story.type,
+        isOrganization: story.type === 'organization',
+        mapRequestData
+      })
+      
       const mapResponse = await fetch('/api/admin/add-to-map', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
         },
-        body: JSON.stringify({
-          storyId: story.id,
-          title: story.title,
-          story: story.type === 'organization' ? story.organizationDescription : story.story,
-          country: story.country,
-          city: story.city,
-          category: story.type === 'organization' ? 'organization' : 'story',
-          type: story.type === 'organization' ? 'organization' : 'story'
-        })
+        body: JSON.stringify(mapRequestData)
       })
 
       if (mapResponse.ok) {

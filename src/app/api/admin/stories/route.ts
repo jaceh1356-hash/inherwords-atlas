@@ -44,6 +44,16 @@ export async function GET() {
           // Check if this is an organization based on data format
           const isOrganization = row.id?.startsWith('organization_') || row.type === 'organization'
           
+          console.log('🔍 STORY PROCESSING DEBUG:', {
+            id: row.id,
+            title: row.title,
+            dbType: row.type,
+            startsWithOrg: row.id?.startsWith('organization_'),
+            typeEqualsOrg: row.type === 'organization',
+            finalIsOrganization: isOrganization,
+            finalTypeAssigned: row.type || (isOrganization ? 'organization' : 'personal')
+          })
+          
           return {
             id: row.id,
             type: row.type || (isOrganization ? 'organization' : 'personal'),

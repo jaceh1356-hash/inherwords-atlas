@@ -68,7 +68,13 @@ export async function POST(request: NextRequest) {
     // Clean any "Organization:" prefix from the story content
     const cleanStory = story ? story.replace(/^Organization:\s*/, '') : ''
 
-    console.log('🔄 Adding to map:', { storyId, title, story: cleanStory ? `"${cleanStory.substring(0, 50)}..."` : 'MISSING', country, city, category, type })
+    console.log('🔄 Adding to map - RAW DATA:', { storyId, title, story: cleanStory ? `"${cleanStory.substring(0, 50)}..."` : 'MISSING', country, city, category, type })
+    console.log('🔍 TYPE DEBUG:', { 
+      receivedType: type, 
+      typeOfType: typeof type, 
+      isOrganization: type === 'organization',
+      categoryReceived: category 
+    })
 
     // Validate required fields
     if (!storyId || !title || !country) {
@@ -88,6 +94,13 @@ export async function POST(request: NextRequest) {
 
     // Determine the pin type - use 'organization' if type is 'organization', otherwise 'story'
     const pinType = type === 'organization' ? 'organization' : 'story'
+    
+    console.log('🎯 PIN TYPE LOGIC:', {
+      inputType: type,
+      comparison: `"${type}" === "organization"`,
+      result: type === 'organization',
+      finalPinType: pinType
+    })
 
     // Create new pin object
     const newPin = {
