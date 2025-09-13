@@ -342,7 +342,10 @@ export default function InteractiveMapClient() {
       
       return L.divIcon({
         className: 'custom-marker',
-        html: `<div class="pushpin-container"><div class="pushpin-head" style="background-color: ${color}"></div><div class="pushpin-needle" style="background-color: ${color}"></div></div>`,
+        html: `<div class="pushpin-container">
+          <div class="pushpin-head" style="background: radial-gradient(circle at 30% 30%, ${isOrganization ? '#3b82f6' : '#ff6b6b'}, ${color}, ${isOrganization ? '#1e40af' : '#b91c1c'});"></div>
+          <div class="pushpin-needle"></div>
+        </div>`,
         iconSize: [26, 38],
         iconAnchor: [13, 38]
       })
@@ -479,7 +482,6 @@ export default function InteractiveMapClient() {
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: radial-gradient(circle at 30% 30%, #ff6b6b, #dc2626, #b91c1c);
           position: absolute;
           top: 0;
           left: 50%;
