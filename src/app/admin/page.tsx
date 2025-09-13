@@ -166,6 +166,35 @@ export default function AdminPage() {
     }
   }
 
+  const deleteStory = async (story: Story) => {
+    if (!confirm(`Are you sure you want to permanently delete "${story.title}"? This action cannot be undone.`)) {
+      return
+    }
+
+    setProcessingId(story.id)
+    try {
+      const response = await fetch('/api/admin/delete-story', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId: story.id })
+      })
+
+      if (response.ok) {
+        fetchStories()
+        fetchCurrentPins()
+        alert('✅ Story deleted permanently!')
+      } else {
+        const errorData = await response.json()
+        alert(`❌ Failed to delete story: ${errorData.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error deleting story:', error)
+      alert('❌ Error deleting story')
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
   const removeFromMap = async (story: Story) => {
     if (!confirm(`Are you sure you want to remove "${story.title}" from the map?`)) {
       return
@@ -441,6 +470,17 @@ export default function AdminPage() {
                           </button>
                         </>
                       )}
+
+                      {/* Delete button - always available */}
+                      <div className="border-t pt-3 mt-3">
+                        <button
+                          onClick={() => deleteStory(story)}
+                          disabled={processingId === story.id}
+                          className="px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 disabled:opacity-50 w-full"
+                        >
+                          {processingId === story.id ? 'Deleting...' : '🗑️ Delete Permanently'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
