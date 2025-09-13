@@ -1,4 +1,4 @@
--- Create map_pins table
+-- Create map_pins table - Production ready with organization support!
 CREATE TABLE IF NOT EXISTS map_pins (
   id VARCHAR(255) PRIMARY KEY,
   title TEXT NOT NULL,
