@@ -63,9 +63,12 @@ async function getCoordinates(city: string, country: string): Promise<{ lat: num
 
 export async function POST(request: NextRequest) {
   try {
-    const { storyId, title, story, country, city, category } = await request.json()
+    const { storyId, title, story, country, city, category, type } = await request.json()
 
-    console.log('🔄 Adding to map:', { storyId, title, story: story ? `"${story.substring(0, 50)}..."` : 'MISSING', country, city, category })
+    // Clean any "Organization:" prefix from the story content
+    const cleanStory = story ? story.replace(/^Organization:\s*/, '') : ''
+
+    console.log('🔄 Adding to map:', { storyId, title, story: cleanStory ? `"${cleanStory.substring(0, 50)}..."` : 'MISSING', country, city, category, type })
 
     // Validate required fields
     if (!storyId || !title || !country) {
@@ -83,14 +86,17 @@ export async function POST(request: NextRequest) {
 
     console.log('📍 Coordinates found:', coordinates)
 
+    // Determine the pin type - use 'organization' if type is 'organization', otherwise 'story'
+    const pinType = type === 'organization' ? 'organization' : 'story'
+
     // Create new pin object
     const newPin = {
       id: storyId,
       title: title,
-      story: story || '',
+      story: cleanStory,
       lat: coordinates.lat,
       lng: coordinates.lng,
-      type: 'story',
+      type: pinType,
       category: category || 'general',
       country: country,
       city: city || ''
@@ -103,12 +109,13 @@ export async function POST(request: NextRequest) {
         try {
           await sql`
             INSERT INTO map_pins (id, title, story, lat, lng, type, category, country, city)
-            VALUES (${storyId}, ${title}, ${story || ''}, ${coordinates.lat}, ${coordinates.lng}, 'story', ${category || 'general'}, ${country}, ${city || ''})
+            VALUES (${storyId}, ${title}, ${cleanStory}, ${coordinates.lat}, ${coordinates.lng}, ${pinType}, ${category || 'general'}, ${country}, ${city || ''})
             ON CONFLICT (id) DO UPDATE SET 
               title = EXCLUDED.title,
               story = EXCLUDED.story,
               lat = EXCLUDED.lat,
               lng = EXCLUDED.lng,
+              type = EXCLUDED.type,
               category = EXCLUDED.category,
               country = EXCLUDED.country,
               city = EXCLUDED.city
@@ -117,11 +124,12 @@ export async function POST(request: NextRequest) {
           console.log('Story column does not exist, using basic insert')
           await sql`
             INSERT INTO map_pins (id, title, lat, lng, type, category, country, city)
-            VALUES (${storyId}, ${title}, ${coordinates.lat}, ${coordinates.lng}, 'story', ${category || 'general'}, ${country}, ${city || ''})
+            VALUES (${storyId}, ${title}, ${coordinates.lat}, ${coordinates.lng}, ${pinType}, ${category || 'general'}, ${country}, ${city || ''})
             ON CONFLICT (id) DO UPDATE SET 
               title = EXCLUDED.title,
               lat = EXCLUDED.lat,
               lng = EXCLUDED.lng,
+              type = EXCLUDED.type,
               category = EXCLUDED.category,
               country = EXCLUDED.country,
               city = EXCLUDED.city
@@ -129,7 +137,8 @@ export async function POST(request: NextRequest) {
         }
         
         console.log(`✅ Added pin to database for ${title} at ${coordinates.lat}, ${coordinates.lng}`)
-        console.log(`📝 Story content saved: ${story ? `"${story.substring(0, 50)}..."` : 'NO STORY'}`)
+        console.log(`📝 Story content saved: ${cleanStory ? `"${cleanStory.substring(0, 50)}..."` : 'NO STORY'}`)
+        console.log(`🎯 Pin type: ${pinType}`)
         return NextResponse.json({ success: true, coordinates, pin: newPin })
       } catch (dbError) {
         console.error('❌ Database error:', dbError)

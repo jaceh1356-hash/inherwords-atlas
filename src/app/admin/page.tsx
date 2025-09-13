@@ -7,6 +7,11 @@ interface Story {
   id: string
   title: string
   story: string
+  type?: string
+  organizationName?: string
+  organizationDescription?: string
+  website?: string
+  focusAreas?: string[]
   country: string
   city: string
   email: string
@@ -106,10 +111,11 @@ export default function AdminPage() {
         body: JSON.stringify({
           storyId: story.id,
           title: story.title,
-          story: story.story,
+          story: story.type === 'organization' ? story.organizationDescription : story.story,
           country: story.country,
           city: story.city,
-          category: 'story' // You can make this dynamic
+          category: story.type === 'organization' ? 'organization' : 'story',
+          type: story.type || 'personal'
         })
       })
 
@@ -214,10 +220,11 @@ export default function AdminPage() {
         body: JSON.stringify({
           storyId: story.id,
           title: story.title,
-          story: story.story,
+          story: story.type === 'organization' ? story.organizationDescription : story.story,
           country: story.country,
           city: story.city,
-          category: 'story'
+          category: story.type === 'organization' ? 'organization' : 'story',
+          type: story.type || 'personal'
         })
       })
 
