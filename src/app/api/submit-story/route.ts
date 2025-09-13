@@ -4,7 +4,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🚀 Submit story called, NODE_ENV:', process.env.NODE_ENV)
     const formData = await request.json()
+    console.log('📝 Form data received:', { type: formData.type, title: formData.title || formData.organizationName })
     
     // Validate required fields based on type
     if (!formData.type || !formData.country) {
@@ -39,16 +41,9 @@ export async function POST(request: NextRequest) {
     const submissionId = `${formData.type}_${uuidv4()}`
 
     if (process.env.NODE_ENV === 'production') {
-      // Production: Save to Vercel Postgres database
+      // Production: Save to Vercel Postgres database using proper columns
       try {
         if (formData.type === 'personal') {
-          // First ensure type column exists
-          try {
-            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'personal'`
-          } catch (alterError) {
-            console.log('Type column already exists or cannot be added')
-          }
-          
           await sql`
             INSERT INTO stories (id, type, title, story, country, city, email, anonymous, status, submitted_at)
             VALUES (
@@ -65,46 +60,34 @@ export async function POST(request: NextRequest) {
             )
           `
         } else {
-          // For organizations, try to use existing columns and add missing ones if needed
+          // Try organization columns first, fallback to basic columns if they don't exist
           try {
-            // First, try to add missing columns if they don't exist
-            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'personal'`
-            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS organization_name VARCHAR(255)`
-            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS organization_description TEXT`
-            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS website VARCHAR(500)`
-            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS focus_areas TEXT[]`
-            
             await sql`
-              INSERT INTO stories (id, type, organization_name, organization_description, website, focus_areas, country, city, email, status, submitted_at)
+              INSERT INTO stories (id, type, title, story, organization_name, organization_description, website, focus_areas, country, city, email, anonymous, status, submitted_at)
               VALUES (
                 ${submissionId},
-                ${formData.type},
+                'organization',
                 ${formData.organizationName},
                 ${formData.organizationDescription},
-                ${formData.website || ''},
-                ${formData.focusAreas || []},
+                ${formData.organizationName},
+                ${formData.organizationDescription},
+                ${formData.website || null},
+                ${formData.focusAreas ? JSON.stringify(formData.focusAreas) : null},
                 ${formData.country},
                 ${formData.city || ''},
                 ${formData.email || ''},
+                false,
                 'pending',
                 NOW()
               )
             `
-          } catch (orgError) {
-            console.log('Organization columns missing, storing as regular story format with type')
-            // First ensure type column exists
-            try {
-              await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'personal'`
-            } catch (alterError) {
-              console.log('Type column already exists or cannot be added')
-            }
-            
-            // Fallback: store organization data in existing columns but INCLUDE TYPE
+          } catch (orgColumnError) {
+            console.log('Organization columns not found, using fallback approach')
+            // Fallback: use basic columns with organization data embedded
             await sql`
-              INSERT INTO stories (id, type, title, story, country, city, email, anonymous, status, submitted_at)
+              INSERT INTO stories (id, title, story, country, city, email, anonymous, status, submitted_at)
               VALUES (
                 ${submissionId},
-                'organization',
                 ${formData.organizationName},
                 ${formData.organizationDescription + (formData.website ? '\nWebsite: ' + formData.website : '') + (formData.focusAreas?.length ? '\nFocus Areas: ' + formData.focusAreas.join(', ') : '')},
                 ${formData.country},
@@ -133,8 +116,10 @@ export async function POST(request: NextRequest) {
         )
       }
     } else {
-      // Local development: You can add local storage here
+      // Development mode
       console.log(`Development mode: ${formData.type === 'organization' ? 'Organization' : 'Story'} would be saved to database in production`)
+      console.log('Submission data:', { submissionId, type: formData.type, title: formData.title || formData.organizationName })
+      
       return NextResponse.json({ 
         success: true, 
         message: `${formData.type === 'organization' ? 'Organization' : 'Story'} submitted successfully! (Development mode)`,

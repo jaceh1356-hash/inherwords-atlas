@@ -41,39 +41,29 @@ export async function GET() {
         }
         
         const stories = result.rows.map(row => {
-          // BULLETPROOF organization detection - check ALL possible indicators
-          const hasOrgId = row.id?.startsWith('organization_')
-          const hasOrgType = row.type === 'organization'
-          const hasOrgColumns = row.organization_name || row.organization_description
-          
-          // If ANY of these are true, it's an organization
-          const isOrganization = hasOrgId || hasOrgType || hasOrgColumns
+          // Simple type detection since you have the type column
+          const isOrganization = row.type === 'organization'
           
           console.log('🔍 STORY PROCESSING DEBUG:', {
             id: row.id,
             title: row.title,
             dbType: row.type,
-            hasOrgId,
-            hasOrgType, 
-            hasOrgColumns,
-            finalIsOrganization: isOrganization,
+            isOrganization,
             finalTypeAssigned: isOrganization ? 'organization' : 'personal'
           })
           
           return {
             id: row.id,
-            type: isOrganization ? 'organization' : 'personal', // FORCE the correct type
+            type: row.type || 'personal', // Use the actual type column
             title: row.title,
             story: row.story,
-            organizationName: row.organization_name || (isOrganization ? row.title : undefined),
-            organizationDescription: row.organization_description || 
-              (isOrganization ? row.story?.split('\nWebsite:')[0] : undefined),
-            website: row.website || 
-              (isOrganization && row.story?.includes('\nWebsite:') ? 
-                row.story.split('\nWebsite:')[1]?.split('\n')[0]?.trim() : undefined),
-            focusAreas: row.focus_areas || 
-              (isOrganization && row.story?.includes('\nFocus Areas:') ? 
-                row.story.split('\nFocus Areas:')[1]?.trim().split(', ') : []),
+            organizationName: row.organization_name,
+            organizationDescription: row.organization_description,
+            website: row.website,
+            focusAreas: row.focus_areas ? 
+              (typeof row.focus_areas === 'string' ? 
+                JSON.parse(row.focus_areas) : 
+                row.focus_areas) : [],
             country: row.country,
             city: row.city || '',
             email: row.email || '',

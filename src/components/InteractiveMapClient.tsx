@@ -321,7 +321,9 @@ export default function InteractiveMapClient() {
           pin.title?.toLowerCase().includes('org ') ||
           pin.title?.toLowerCase().includes('foundation') ||
           pin.title?.toLowerCase().includes('center') ||
-          pin.title?.toLowerCase().includes('institute')) {
+          pin.title?.toLowerCase().includes('institute') ||
+          pin.title?.startsWith('[ORG]') ||
+          pin.story?.startsWith('TYPE:organization')) {
         isOrganization = true
       }
       
@@ -332,6 +334,8 @@ export default function InteractiveMapClient() {
         type: pin.type,
         category: pin.category,
         id: pin.id,
+        hasOrgPrefix: pin.title?.startsWith('[ORG]'),
+        hasOrgMarker: pin.story?.startsWith('TYPE:organization'),
         isOrganization,
         color
       })
@@ -356,6 +360,19 @@ export default function InteractiveMapClient() {
         pinType: `"${pin.type}"`,
         isOrganization: pin.type === 'organization'
       })
+      
+      // DETAILED ORGANIZATION DETECTION DEBUG
+      console.log('🔍 ORGANIZATION DETECTION DEBUG for', pin.title, {
+        'pin.type': pin.type,
+        'pin.category': pin.category,
+        'pin.id': pin.id,
+        'type === org': pin.type === 'organization',
+        'category === org': pin.category === 'organization',
+        'id includes org': pin.id?.includes('organization'),
+        'title includes org': pin.title?.toLowerCase().includes('organization'),
+        'title includes foundation': pin.title?.toLowerCase().includes('foundation')
+      })
+      
       const marker = L.marker([pin.lat, pin.lng], { icon: createPushpinIcon(pin) })
         .addTo(leafletMap.current!)
 
@@ -363,12 +380,19 @@ export default function InteractiveMapClient() {
       const isOrgPin = pin.type === 'organization' || 
                        pin.category === 'organization' || 
                        pin.id?.includes('organization') ||
-                       pin.title?.toLowerCase().includes('organization')
+                       pin.title?.toLowerCase().includes('organization') ||
+                       pin.title?.startsWith('[ORG]') ||
+                       pin.story?.startsWith('TYPE:organization')
+      
+      // Clean the title and story for display
+      const displayTitle = pin.title?.startsWith('[ORG]') ? pin.title.substring(5).trim() : pin.title
+      const displayStory = pin.story?.startsWith('TYPE:organization\n') ? 
+        pin.story.substring(18) : pin.story
       
       marker.bindPopup(`
         <div class="custom-popup">
-          <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
-          <p class="text-xs text-slate-600 mb-2">${isOrgPin ? (pin.story && pin.story.trim() ? pin.story.replace(/^Organization:\s*/, '').substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Organization information not available') : (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Story content not available')}</p>
+          <h4 class="font-bold text-sm mb-1">${displayTitle}</h4>
+          <p class="text-xs text-slate-600 mb-2">${isOrgPin ? (displayStory && displayStory.trim() ? displayStory.substring(0, 150) + (displayStory.length > 150 ? '...' : '') : 'Organization information not available') : (displayStory && displayStory.trim() ? displayStory.substring(0, 150) + (displayStory.length > 150 ? '...' : '') : 'Story content not available')}</p>
           <span class="inline-block px-2 py-1 ${isOrgPin ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'} text-xs rounded-full">${pin.category}</span>
         </div>
       `)

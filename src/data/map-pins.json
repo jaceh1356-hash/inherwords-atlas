@@ -11,13 +11,24 @@
     "city": "New York"
   },
   {
+    "id": "organization_test_1",
+    "title": "Women's Health Foundation",
+    "story": "A nonprofit organization dedicated to improving women's health outcomes through research, advocacy, and community programs. We provide free screenings and educational resources.",
+    "lat": 34.0522,
+    "lng": -118.2437,
+    "type": "organization",
+    "category": "organization",
+    "country": "United States",
+    "city": "Los Angeles"
+  },
+  {
     "id": "sample_2",
-    "title": "Workplace Rights Campaign",
+    "title": "Women's Workplace Rights Organization",
     "story": "When I discovered the gender pay gap in my company, I decided to take action. It wasn't easy to speak up, knowing it could impact my career. But I documented everything and worked with HR to implement fair compensation policies that benefited all employees.",
     "lat": 51.5074,
     "lng": -0.1278,
-    "type": "story",
-    "category": "workplace",
+    "type": "organization",
+    "category": "organization",
     "country": "United Kingdom",
     "city": "London"
   },

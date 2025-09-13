@@ -100,7 +100,9 @@ export async function POST(request: NextRequest) {
         category === 'organization' || 
         storyId?.includes('organization') ||
         title?.toLowerCase().includes('organization') ||
-        cleanStory?.toLowerCase().includes('organization')) {
+        title?.startsWith('[ORG]') ||
+        cleanStory?.toLowerCase().includes('organization') ||
+        cleanStory?.startsWith('TYPE:organization')) {
       pinType = 'organization'
     }
     
@@ -110,15 +112,22 @@ export async function POST(request: NextRequest) {
       storyId,
       hasOrgInId: storyId?.includes('organization'),
       hasOrgInTitle: title?.toLowerCase().includes('organization'),
+      hasOrgPrefix: title?.startsWith('[ORG]'),
       hasOrgInStory: cleanStory?.toLowerCase().includes('organization'),
+      hasOrgMarker: cleanStory?.startsWith('TYPE:organization'),
       finalPinType: pinType
     })
+
+    // Clean the title and story for display
+    const cleanTitle = title?.startsWith('[ORG]') ? title.substring(5).trim() : title
+    const finalStory = cleanStory?.startsWith('TYPE:organization\n') ? 
+      cleanStory.substring(18) : cleanStory
 
     // Create new pin object
     const newPin = {
       id: storyId,
-      title: title,
-      story: cleanStory,
+      title: cleanTitle,
+      story: finalStory,
       lat: coordinates.lat,
       lng: coordinates.lng,
       type: pinType,
