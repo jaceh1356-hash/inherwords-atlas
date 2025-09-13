@@ -309,9 +309,33 @@ export default function InteractiveMapClient() {
       }
     })
 
-    // Create custom pushpin icon function
-    const createPushpinIcon = (type: 'story' | 'organization') => {
-      const color = type === 'organization' ? '#1e3a8a' : '#dc2626' // Dark blue for organizations, red for stories
+    // Create custom pushpin icon function with BULLETPROOF type detection
+    const createPushpinIcon = (pin: MapPin) => {
+      // MULTIPLE WAYS to detect if this should be an organization pin
+      let isOrganization = false
+      
+      if (pin.type === 'organization' ||
+          pin.category === 'organization' ||
+          pin.id?.includes('organization') ||
+          pin.title?.toLowerCase().includes('organization') ||
+          pin.title?.toLowerCase().includes('org ') ||
+          pin.title?.toLowerCase().includes('foundation') ||
+          pin.title?.toLowerCase().includes('center') ||
+          pin.title?.toLowerCase().includes('institute')) {
+        isOrganization = true
+      }
+      
+      const color = isOrganization ? '#1e3a8a' : '#dc2626' // Dark blue for organizations, red for stories
+      
+      console.log('🎨 PIN COLOR DEBUG:', {
+        title: pin.title,
+        type: pin.type,
+        category: pin.category,
+        id: pin.id,
+        isOrganization,
+        color
+      })
+      
       return L.divIcon({
         className: 'custom-marker',
         html: `<div class="pushpin-container"><div class="pushpin-head" style="background-color: ${color}"></div><div class="pushpin-needle" style="background-color: ${color}"></div></div>`,
@@ -332,15 +356,20 @@ export default function InteractiveMapClient() {
         pinType: `"${pin.type}"`,
         isOrganization: pin.type === 'organization'
       })
-      const marker = L.marker([pin.lat, pin.lng], { icon: createPushpinIcon(pin.type) })
+      const marker = L.marker([pin.lat, pin.lng], { icon: createPushpinIcon(pin) })
         .addTo(leafletMap.current!)
 
-      // Add popup with story/organization info
+      // Add popup with story/organization info using bulletproof detection
+      const isOrgPin = pin.type === 'organization' || 
+                       pin.category === 'organization' || 
+                       pin.id?.includes('organization') ||
+                       pin.title?.toLowerCase().includes('organization')
+      
       marker.bindPopup(`
         <div class="custom-popup">
           <h4 class="font-bold text-sm mb-1">${pin.title}</h4>
-          <p class="text-xs text-slate-600 mb-2">${pin.type === 'organization' ? (pin.story && pin.story.trim() ? pin.story.replace(/^Organization:\s*/, '').substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Organization information not available') : (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Story content not available')}</p>
-          <span class="inline-block px-2 py-1 ${pin.type === 'organization' ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'} text-xs rounded-full">${pin.category}</span>
+          <p class="text-xs text-slate-600 mb-2">${isOrgPin ? (pin.story && pin.story.trim() ? pin.story.replace(/^Organization:\s*/, '').substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Organization information not available') : (pin.story && pin.story.trim() ? pin.story.substring(0, 150) + (pin.story.length > 150 ? '...' : '') : 'Story content not available')}</p>
+          <span class="inline-block px-2 py-1 ${isOrgPin ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'} text-xs rounded-full">${pin.category}</span>
         </div>
       `)
     })

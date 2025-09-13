@@ -29,17 +29,29 @@ export async function GET() {
           `
         }
         
-        const pins = result.rows.map(row => ({
-          id: row.id,
-          title: row.title,
-          story: hasStoryColumn ? (row.story || '') : '',
-          lat: Number(row.lat),
-          lng: Number(row.lng),
-          type: row.type,
-          category: row.category,
-          country: row.country,
-          city: row.city
-        }))
+        const pins = result.rows.map(row => {
+          // BULLETPROOF type detection for pins
+          let pinType = row.type || 'story'
+          
+          // Double-check: if ID contains 'organization' or category is 'organization', override type
+          if (row.id?.includes('organization') || 
+              row.category === 'organization' ||
+              row.title?.toLowerCase().includes('organization')) {
+            pinType = 'organization'
+          }
+          
+          return {
+            id: row.id,
+            title: row.title,
+            story: hasStoryColumn ? (row.story || '') : '',
+            lat: Number(row.lat),
+            lng: Number(row.lng),
+            type: pinType, // Use our bulletproof type
+            category: row.category,
+            country: row.country,
+            city: row.city
+          }
+        })
         
         console.log(`Returning ${pins.length} pins from database`)
         console.log('Sample pin with story info:', pins[0] ? { id: pins[0].id, title: pins[0].title, story: pins[0].story ? 'HAS STORY' : 'NO STORY', storyLength: pins[0].story?.length || 0 } : 'No pins')

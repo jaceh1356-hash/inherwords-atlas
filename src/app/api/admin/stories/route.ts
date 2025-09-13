@@ -41,22 +41,28 @@ export async function GET() {
         }
         
         const stories = result.rows.map(row => {
-          // Check if this is an organization based on data format
-          const isOrganization = row.id?.startsWith('organization_') || row.type === 'organization'
+          // BULLETPROOF organization detection - check ALL possible indicators
+          const hasOrgId = row.id?.startsWith('organization_')
+          const hasOrgType = row.type === 'organization'
+          const hasOrgColumns = row.organization_name || row.organization_description
+          
+          // If ANY of these are true, it's an organization
+          const isOrganization = hasOrgId || hasOrgType || hasOrgColumns
           
           console.log('🔍 STORY PROCESSING DEBUG:', {
             id: row.id,
             title: row.title,
             dbType: row.type,
-            startsWithOrg: row.id?.startsWith('organization_'),
-            typeEqualsOrg: row.type === 'organization',
+            hasOrgId,
+            hasOrgType, 
+            hasOrgColumns,
             finalIsOrganization: isOrganization,
-            finalTypeAssigned: row.type || (isOrganization ? 'organization' : 'personal')
+            finalTypeAssigned: isOrganization ? 'organization' : 'personal'
           })
           
           return {
             id: row.id,
-            type: row.type || (isOrganization ? 'organization' : 'personal'),
+            type: isOrganization ? 'organization' : 'personal', // FORCE the correct type
             title: row.title,
             story: row.story,
             organizationName: row.organization_name || (isOrganization ? row.title : undefined),

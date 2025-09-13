@@ -92,13 +92,25 @@ export async function POST(request: NextRequest) {
 
     console.log('📍 Coordinates found:', coordinates)
 
-    // Determine the pin type - use 'organization' if type is 'organization', otherwise 'story'
-    const pinType = type === 'organization' ? 'organization' : 'story'
+    // BULLETPROOF pin type determination
+    let pinType = 'story' // default
+    
+    // Check all possible ways this could be an organization
+    if (type === 'organization' || 
+        category === 'organization' || 
+        storyId?.includes('organization') ||
+        title?.toLowerCase().includes('organization') ||
+        cleanStory?.toLowerCase().includes('organization')) {
+      pinType = 'organization'
+    }
     
     console.log('🎯 PIN TYPE LOGIC:', {
       inputType: type,
-      comparison: `"${type}" === "organization"`,
-      result: type === 'organization',
+      inputCategory: category,
+      storyId,
+      hasOrgInId: storyId?.includes('organization'),
+      hasOrgInTitle: title?.toLowerCase().includes('organization'),
+      hasOrgInStory: cleanStory?.toLowerCase().includes('organization'),
       finalPinType: pinType
     })
 

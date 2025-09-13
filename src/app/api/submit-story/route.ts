@@ -42,10 +42,18 @@ export async function POST(request: NextRequest) {
       // Production: Save to Vercel Postgres database
       try {
         if (formData.type === 'personal') {
+          // First ensure type column exists
+          try {
+            await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'personal'`
+          } catch (alterError) {
+            console.log('Type column already exists or cannot be added')
+          }
+          
           await sql`
-            INSERT INTO stories (id, title, story, country, city, email, anonymous, status, submitted_at)
+            INSERT INTO stories (id, type, title, story, country, city, email, anonymous, status, submitted_at)
             VALUES (
               ${submissionId},
+              'personal',
               ${formData.title},
               ${formData.story},
               ${formData.country},
@@ -83,12 +91,20 @@ export async function POST(request: NextRequest) {
               )
             `
           } catch (orgError) {
-            console.log('Organization columns missing, storing as regular story format')
-            // Fallback: store organization data in existing columns
+            console.log('Organization columns missing, storing as regular story format with type')
+            // First ensure type column exists
+            try {
+              await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'personal'`
+            } catch (alterError) {
+              console.log('Type column already exists or cannot be added')
+            }
+            
+            // Fallback: store organization data in existing columns but INCLUDE TYPE
             await sql`
-              INSERT INTO stories (id, title, story, country, city, email, anonymous, status, submitted_at)
+              INSERT INTO stories (id, type, title, story, country, city, email, anonymous, status, submitted_at)
               VALUES (
                 ${submissionId},
+                'organization',
                 ${formData.organizationName},
                 ${formData.organizationDescription + (formData.website ? '\nWebsite: ' + formData.website : '') + (formData.focusAreas?.length ? '\nFocus Areas: ' + formData.focusAreas.join(', ') : '')},
                 ${formData.country},
