@@ -30,23 +30,39 @@ export async function GET() {
         }
         
         const pins = result.rows.map(row => {
-          // BULLETPROOF type detection for pins
-          let pinType = row.type || 'story'
-          
-          // Double-check: if ID contains 'organization' or category is 'organization', override type
-          if (row.id?.includes('organization') || 
-              row.category === 'organization' ||
-              row.title?.toLowerCase().includes('organization')) {
-            pinType = 'organization'
+          // Robust type detection for pins, supporting event and resource
+          const rawType = (row.type || 'story').toLowerCase()
+          const rawCategory = (row.category || '').toLowerCase()
+          const lowerTitle = (row.title || '').toLowerCase()
+
+          let pinType: 'story' | 'organization' | 'event' | 'resource' = 'story'
+
+          // Prefer explicit correct types
+          if (['story', 'organization', 'event', 'resource'].includes(rawType)) {
+            pinType = rawType as typeof pinType
           }
-          
+
+          // Category hints
+          if (['organization', 'event', 'resource'].includes(rawCategory)) {
+            pinType = rawCategory as typeof pinType
+          }
+
+          // Heuristics by id/title
+          if (row.id?.includes('organization') || lowerTitle.includes('organization') || lowerTitle.includes('foundation') || lowerTitle.includes('center') || lowerTitle.includes('institute')) {
+            pinType = 'organization'
+          } else if (lowerTitle.includes('event') || lowerTitle.includes('conference') || lowerTitle.includes('workshop') || lowerTitle.includes('webinar') || lowerTitle.includes('rally') || lowerTitle.includes('march')) {
+            pinType = 'event'
+          } else if (lowerTitle.includes('resource') || lowerTitle.includes('hotline') || lowerTitle.includes('shelter') || lowerTitle.includes('clinic') || lowerTitle.includes('guide') || lowerTitle.includes('support')) {
+            pinType = 'resource'
+          }
+
           return {
             id: row.id,
             title: row.title,
             story: hasStoryColumn ? (row.story || '') : '',
             lat: Number(row.lat),
             lng: Number(row.lng),
-            type: pinType, // Use our bulletproof type
+            type: pinType,
             category: row.category,
             country: row.country,
             city: row.city
@@ -66,7 +82,27 @@ export async function GET() {
       
       const filePath = path.join(process.cwd(), 'src/data/map-pins.json')
       const fileContents = await fs.readFile(filePath, 'utf8')
-      const pins = JSON.parse(fileContents)
+      const pinsRaw = JSON.parse(fileContents)
+
+      // Normalize types to include event and resource heuristics
+      const pins = pinsRaw.map((row: any) => {
+        const rawType = (row.type || 'story').toLowerCase()
+        const rawCategory = (row.category || '').toLowerCase()
+        const lowerTitle = (row.title || '').toLowerCase()
+        const storyText = row.story || ''
+
+        let pinType: 'story' | 'organization' | 'event' | 'resource' = 'story'
+        if (['story', 'organization', 'event', 'resource'].includes(rawType)) pinType = rawType
+        if (['organization', 'event', 'resource'].includes(rawCategory)) pinType = rawCategory
+        if (storyText.startsWith('TYPE:organization')) pinType = 'organization'
+        if (storyText.startsWith('TYPE:event')) pinType = 'event'
+        if (storyText.startsWith('TYPE:resource')) pinType = 'resource'
+        if (row.id?.includes('organization') || lowerTitle.includes('organization') || lowerTitle.includes('foundation') || lowerTitle.includes('center') || lowerTitle.includes('institute')) pinType = 'organization'
+        if (lowerTitle.includes('event') || lowerTitle.includes('conference') || lowerTitle.includes('workshop') || lowerTitle.includes('webinar') || lowerTitle.includes('rally') || lowerTitle.includes('march')) pinType = 'event'
+        if (lowerTitle.includes('resource') || lowerTitle.includes('hotline') || lowerTitle.includes('shelter') || lowerTitle.includes('clinic') || lowerTitle.includes('guide') || lowerTitle.includes('support')) pinType = 'resource'
+
+        return { ...row, type: pinType }
+      })
       
       console.log(`Returning ${pins.length} pins from local storage`)
       console.log('First pin with story:', pins[0])
@@ -79,8 +115,8 @@ export async function GET() {
   // Return fallback pins if everything else fails
   const fallbackPins = [
     { title: 'NYC Healthcare Story', story: 'A healthcare access story from New York City', lat: 40.7128, lng: -74.0060, type: 'story', category: 'healthcare' },
-    { title: 'LA Support Center', story: 'Supporting women in Los Angeles', lat: 34.0522, lng: -118.2437, type: 'story', category: 'support' },
-    { title: 'London Workplace Rights', story: 'Fighting for workplace equality in London', lat: 51.5074, lng: -0.1278, type: 'story', category: 'workplace' }
+    { title: 'LA Support Center', story: 'A local support resource for women and families', lat: 34.0522, lng: -118.2437, type: 'resource', category: 'support' },
+    { title: 'London Workplace Rights Workshop', story: 'TYPE:event\nCommunity workshop on workplace equality rights and advocacy', lat: 51.5074, lng: -0.1278, type: 'event', category: 'workplace' }
   ]
   
   console.log('Using fallback pins due to error')
