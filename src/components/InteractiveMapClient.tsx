@@ -454,6 +454,12 @@ export default function InteractiveMapClient() {
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#059669' }}></div>
                 <span className="text-sm text-gray-600">Resources</span>
+                <div className="w-4 h-4 rounded-full bg-red-600"></div>
+                <span className="text-sm text-gray-600">Violation of Human Rights</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-blue-800"></div>
+                <span className="text-sm text-gray-600">Protection of Human Rights</span>
               </div>
             </div>
           </div>
