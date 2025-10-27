@@ -20,7 +20,7 @@ import L from 'leaflet'
  */
 
 // Pin interface for TypeScript
-type PinType = 'story' | 'organization' | 'event' | 'resource'
+type PinType = 'story' | 'organization' | 'event' | 'resource' | 'Violation of Human Rights'
 
 interface MapPin {
   id?: string
